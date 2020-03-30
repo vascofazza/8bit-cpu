@@ -1,4 +1,3 @@
 (fp_lib_table
-  (lib (name 8bit-custom-footprints)(type KiCad)(uri "$(KIPRJMOD)/8bit-custom-footprints.pretty")(options "")(descr ""))
-  (lib (name pcb-battery)(type KiCad)(uri /Users/eater/youtube/pcb-card/pcb-battery.pretty)(options "")(descr ""))
+  (lib (name Housings_LCC)(type KiCad)(uri ${KIPRJMOD}/Housings_LCC.pretty)(options "")(descr ""))
 )
