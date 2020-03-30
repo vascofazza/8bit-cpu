@@ -5,6 +5,7 @@ Schematics and code for my home-made 8-bit CPU.
 ## Overview
 
 During the past month, I designed and built a programmable 8-bit CPU from scratch, out of basic series 74LS logic ICs.
+
 This repository contains pictures, schematics, and code for this project and its companion boards.
 
 * V 1.0 assembled:
@@ -40,7 +41,7 @@ The MK1 CPU is composed of several modules, all connecter though a common 8-bit 
 - The computation output can be visualized on a 4-digit display, with a dedicated register, able to represent positive and 2-complement negative numbers both in decimal and hexadecimal format.
 
 - The CPU can be extended thanks to the external BUS interface capable of handling up to 2 peripheral. The communication is bidirectional, the devices can send interrupts to the CPU to notify when new data is available. Interrupts are cleared once the data has been processed.
-  - The only available peripheral at the moment is the **Helix** display interface, an Arduino-driven 2x16 LCD output display. 
+  - The only available peripheral at the moment is the **Helix** display interface, an ATmega328-driven 2x16 LCD output display.
 
 ## Structure
 
