@@ -1,0 +1,4 @@
+(sym_lib_table
+  (lib (name 8bit-computer-rescue)(type Legacy)(uri "/Users/fscozzafava/Library/Mobile Documents/com~apple~CloudDocs/computer project/8bit-computer/8bit-computer-rescue.lib")(options "")(descr ""))
+  (lib (name arduino)(type Legacy)(uri ${KIPRJMOD}/arduino-kicad-library/arduino.lib)(options "")(descr ""))
+)
