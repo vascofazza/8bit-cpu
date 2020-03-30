@@ -1,0 +1,70 @@
+;division
+j main
+op_a: 10
+op_b: 4
+main:
+lda op_a
+ldb op_b
+jal reminder
+out
+hlt
+
+cmp: sub
+add
+bcf ret_false
+; a greater
+ldai 1
+jsp
+; b greater
+ret_false: ldai 0
+jsp
+
+lt_zero:
+andi 128
+subi 128
+bez lt_zero_ret_true
+ldai 0
+jsp
+lt_zero_ret_true: ldai 1
+jsp
+
+reminder:
+sta div_tmp
+ldai 0
+sta div_counter
+mvsa
+mvbs
+subi 1
+mvsb
+mvas
+stbsp
+j div_loop
+div_counter: 0
+div_tmp: 0
+div_rem: 0
+div_loop:
+lda div_tmp
+sub
+sta div_tmp
+mvsa
+subi 1
+mvas
+lda div_tmp
+jal lt_zero
+subi 1
+bez div_return
+mvsa
+addi 1
+mvas
+lda div_counter
+addi 1
+sta div_counter
+ldbsp
+j div_loop
+div_return: mvsa
+addi 2
+mvas
+ldai 0
+ldb div_tmp
+sub
+jsp

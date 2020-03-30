@@ -1,0 +1,6 @@
+ldai 12
+ldbi 6
+ldspi 0
+sub
+out
+hlt

@@ -1,0 +1,357 @@
+EESchema Schematic File Version 4
+EELAYER 30 0
+EELAYER END
+$Descr A4 11693 8268
+encoding utf-8
+Sheet 13 13
+Title ""
+Date ""
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+$Comp
+L MCU_Module:Arduino_Nano_v2.x A1
+U 1 1 668C6D9C
+P 6050 3650
+F 0 "A1" H 6050 2561 50  0000 C CNN
+F 1 "Arduino_Nano_v2.x" H 6050 2470 50  0000 C CNN
+F 2 "Module:Arduino_Nano" H 6050 3650 50  0001 C CIN
+F 3 "https://www.arduino.cc/en/uploads/Main/ArduinoNanoManual23.pdf" H 6050 3650 50  0001 C CNN
+	1    6050 3650
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR083
+U 1 1 668C95BA
+P 6150 5000
+F 0 "#PWR083" H 6150 4750 50  0001 C CNN
+F 1 "GND" H 6155 4827 50  0000 C CNN
+F 2 "" H 6150 5000 50  0001 C CNN
+F 3 "" H 6150 5000 50  0001 C CNN
+	1    6150 5000
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:VCC #PWR084
+U 1 1 668C9A0D
+P 6250 2400
+F 0 "#PWR084" H 6250 2250 50  0001 C CNN
+F 1 "VCC" H 6267 2573 50  0000 C CNN
+F 2 "" H 6250 2400 50  0001 C CNN
+F 3 "" H 6250 2400 50  0001 C CNN
+	1    6250 2400
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	6150 5000 6150 4700
+Text HLabel 2150 3250 0    60   Output ~ 0
+BUS_0
+Text HLabel 2150 3350 0    60   Output ~ 0
+BUS_1
+Text HLabel 2150 3450 0    60   Output ~ 0
+BUS_2
+Text HLabel 2150 3550 0    60   Output ~ 0
+BUS_3
+Text HLabel 2150 3650 0    60   Output ~ 0
+BUS_4
+Text HLabel 2150 3750 0    60   Output ~ 0
+BUS_5
+Text HLabel 2150 3850 0    60   Output ~ 0
+BUS_6
+Text HLabel 2150 3950 0    60   Output ~ 0
+BUS_7
+Wire Wire Line
+	3650 3250 5550 3250
+Wire Wire Line
+	3650 3350 5550 3350
+Wire Wire Line
+	3650 3450 5550 3450
+Wire Wire Line
+	3650 3550 5550 3550
+Wire Wire Line
+	3650 3650 5550 3650
+Wire Wire Line
+	3650 3750 5550 3750
+Wire Wire Line
+	3650 3850 5550 3850
+Wire Wire Line
+	3650 3950 5550 3950
+NoConn ~ 5550 3050
+NoConn ~ 5550 3150
+Wire Wire Line
+	6050 4650 6050 4700
+Wire Wire Line
+	6050 4700 6150 4700
+Connection ~ 6150 4700
+Wire Wire Line
+	6150 4700 6150 4650
+NoConn ~ 6550 3450
+NoConn ~ 6550 3150
+NoConn ~ 6550 3050
+NoConn ~ 6550 4350
+NoConn ~ 6550 4250
+NoConn ~ 6550 4150
+NoConn ~ 6550 4050
+NoConn ~ 6550 3950
+NoConn ~ 6550 3850
+NoConn ~ 6550 3750
+NoConn ~ 6550 3650
+Text HLabel 2800 4850 0    60   Output ~ 0
+MI
+Text HLabel 2800 5900 0    60   Output ~ 0
+RI
+Wire Wire Line
+	5550 4250 5450 4250
+Text HLabel 2800 5400 0    60   Output ~ 0
+HL
+NoConn ~ 6150 2650
+$Comp
+L 8bit-computer-rescue:74LS245 U74
+U 1 1 6828F39C
+P 2950 3750
+F 0 "U74" H 2950 4516 50  0000 C CNN
+F 1 "74LS245" H 2950 4425 50  0000 C CNN
+F 2 "Package_DIP:DIP-20_W7.62mm_Socket" H 2950 3750 50  0001 C CNN
+F 3 "" H 2950 3750 50  0001 C CNN
+	1    2950 3750
+	-1   0    0    -1  
+$EndComp
+$Comp
+L 8bit-computer-rescue:74LS04 U75
+U 3 1 682928B3
+P 4550 4850
+F 0 "U75" H 4550 5165 50  0000 C CNN
+F 1 "74LS04" H 4550 5074 50  0000 C CNN
+F 2 "Package_DIP:DIP-14_W7.62mm_Socket" H 4550 4850 50  0001 C CNN
+F 3 "" H 4550 4850 50  0001 C CNN
+	3    4550 4850
+	-1   0    0    -1  
+$EndComp
+$Comp
+L 8bit-computer-rescue:74LS04 U72
+U 6 1 682936B9
+P 3650 5400
+F 0 "U72" H 3650 5715 50  0000 C CNN
+F 1 "74LS04" H 3650 5624 50  0000 C CNN
+F 2 "Package_DIP:DIP-14_W7.62mm_Socket" H 3650 5400 50  0001 C CNN
+F 3 "" H 3650 5400 50  0001 C CNN
+	6    3650 5400
+	-1   0    0    -1  
+$EndComp
+$Comp
+L 8bit-computer-rescue:74LS04 U75
+U 4 1 6829483B
+P 4550 5400
+F 0 "U75" H 4550 5715 50  0000 C CNN
+F 1 "74LS04" H 4550 5624 50  0000 C CNN
+F 2 "Package_DIP:DIP-14_W7.62mm_Socket" H 4550 5400 50  0001 C CNN
+F 3 "" H 4550 5400 50  0001 C CNN
+	4    4550 5400
+	-1   0    0    -1  
+$EndComp
+$Comp
+L 8bit-computer-rescue:74LS04 U75
+U 5 1 68294DDC
+P 4550 5900
+F 0 "U75" H 4550 6215 50  0000 C CNN
+F 1 "74LS04" H 4550 6124 50  0000 C CNN
+F 2 "Package_DIP:DIP-14_W7.62mm_Socket" H 4550 5900 50  0001 C CNN
+F 3 "" H 4550 5900 50  0001 C CNN
+	5    4550 5900
+	-1   0    0    -1  
+$EndComp
+$Comp
+L 8bit-computer-rescue:74LS04 U75
+U 1 1 6829566F
+P 3650 5900
+F 0 "U75" H 3650 6215 50  0000 C CNN
+F 1 "74LS04" H 3650 6124 50  0000 C CNN
+F 2 "Package_DIP:DIP-14_W7.62mm_Socket" H 3650 5900 50  0001 C CNN
+F 3 "" H 3650 5900 50  0001 C CNN
+	1    3650 5900
+	-1   0    0    -1  
+$EndComp
+$Comp
+L 8bit-computer-rescue:74LS04 U75
+U 2 1 68295FCC
+P 4550 4250
+F 0 "U75" H 4550 4565 50  0000 C CNN
+F 1 "74LS04" H 4550 4474 50  0000 C CNN
+F 2 "Package_DIP:DIP-14_W7.62mm_Socket" H 4550 4250 50  0001 C CNN
+F 3 "" H 4550 4250 50  0001 C CNN
+	2    4550 4250
+	-1   0    0    -1  
+$EndComp
+Wire Wire Line
+	2150 3250 2250 3250
+Wire Wire Line
+	2150 3350 2250 3350
+Wire Wire Line
+	2150 3450 2250 3450
+Wire Wire Line
+	2150 3550 2250 3550
+Wire Wire Line
+	2150 3650 2250 3650
+Wire Wire Line
+	2150 3750 2250 3750
+Wire Wire Line
+	2150 3850 2250 3850
+Wire Wire Line
+	2150 3950 2250 3950
+Wire Wire Line
+	3650 4150 3750 4150
+Wire Wire Line
+	3750 4150 3750 2500
+Wire Wire Line
+	3750 2500 5950 2500
+Wire Wire Line
+	6250 2500 6250 2400
+Wire Wire Line
+	2800 5900 3200 5900
+Wire Wire Line
+	2800 5400 3200 5400
+Wire Wire Line
+	5450 4250 5450 5900
+Wire Wire Line
+	5450 5900 5000 5900
+Wire Wire Line
+	5350 4150 5350 5400
+Wire Wire Line
+	5350 5400 5000 5400
+Wire Wire Line
+	5350 4150 5550 4150
+Wire Wire Line
+	5250 4050 5250 4850
+Wire Wire Line
+	5250 4850 5000 4850
+Wire Wire Line
+	5250 4050 5550 4050
+Wire Wire Line
+	5000 4250 5100 4250
+Wire Wire Line
+	5100 4250 5100 4350
+Wire Wire Line
+	5100 4350 5150 4350
+Wire Wire Line
+	4100 4250 3650 4250
+$Comp
+L Device:R R135
+U 1 1 682C06CD
+P 5450 6200
+F 0 "R135" V 5530 6200 50  0000 C CNN
+F 1 "1K" V 5450 6200 50  0000 C CNN
+F 2 "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal" V 5380 6200 50  0001 C CNN
+F 3 "" H 5450 6200 50  0001 C CNN
+	1    5450 6200
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5750 6450 5750 6400
+$Comp
+L Device:R R136
+U 1 1 682C14C4
+P 5750 6200
+F 0 "R136" V 5830 6200 50  0000 C CNN
+F 1 "1K" V 5750 6200 50  0000 C CNN
+F 2 "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal" V 5680 6200 50  0001 C CNN
+F 3 "" H 5750 6200 50  0001 C CNN
+	1    5750 6200
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR082
+U 1 1 682C14CA
+P 5750 6450
+F 0 "#PWR082" H 5750 6200 50  0001 C CNN
+F 1 "GND" H 5750 6300 50  0000 C CNN
+F 2 "" H 5750 6450 50  0001 C CNN
+F 3 "" H 5750 6450 50  0001 C CNN
+	1    5750 6450
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:R R137
+U 1 1 682C1FE9
+P 6050 6200
+F 0 "R137" V 6130 6200 50  0000 C CNN
+F 1 "1K" V 6050 6200 50  0000 C CNN
+F 2 "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal" V 5980 6200 50  0001 C CNN
+F 3 "" H 6050 6200 50  0001 C CNN
+	1    6050 6200
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5450 6350 5450 6400
+Wire Wire Line
+	5450 6400 5750 6400
+Connection ~ 5750 6400
+Wire Wire Line
+	5750 6400 5750 6350
+Wire Wire Line
+	5750 6400 6050 6400
+Wire Wire Line
+	6050 6400 6050 6350
+Wire Wire Line
+	5450 6050 5450 5900
+Connection ~ 5450 5900
+Wire Wire Line
+	5750 6050 5750 5400
+Wire Wire Line
+	5750 5400 5350 5400
+Connection ~ 5350 5400
+Wire Wire Line
+	5250 4850 5250 5250
+Wire Wire Line
+	5250 5250 6050 5250
+Wire Wire Line
+	6050 5250 6050 6050
+Connection ~ 5250 4850
+Wire Wire Line
+	5950 2500 5950 2650
+Connection ~ 5950 2500
+Wire Wire Line
+	5950 2500 6250 2500
+NoConn ~ 6250 2650
+$Comp
+L Device:R R138
+U 1 1 5E80D59E
+P 6300 6200
+F 0 "R138" V 6380 6200 50  0000 C CNN
+F 1 "1K" V 6300 6200 50  0000 C CNN
+F 2 "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal" V 6230 6200 50  0001 C CNN
+F 3 "" H 6300 6200 50  0001 C CNN
+	1    6300 6200
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	6300 6350 6300 6400
+Wire Wire Line
+	6300 6400 6050 6400
+Connection ~ 6050 6400
+Wire Wire Line
+	6300 6050 6300 5300
+Wire Wire Line
+	6300 5300 5150 5300
+Wire Wire Line
+	5150 5300 5150 4350
+Connection ~ 5150 4350
+Wire Wire Line
+	5150 4350 5550 4350
+$Comp
+L 8bit-computer-rescue:74LS04 U72
+U 5 1 5EE0D59D
+P 3650 4850
+F 0 "U72" H 3650 5165 50  0000 C CNN
+F 1 "74LS04" H 3650 5074 50  0000 C CNN
+F 2 "Package_DIP:DIP-14_W7.62mm_Socket" H 3650 4850 50  0001 C CNN
+F 3 "" H 3650 4850 50  0001 C CNN
+	5    3650 4850
+	-1   0    0    -1  
+$EndComp
+Wire Wire Line
+	3200 4850 2800 4850
+$EndSCHEMATC

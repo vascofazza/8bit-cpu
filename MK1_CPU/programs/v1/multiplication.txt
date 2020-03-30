@@ -1,0 +1,28 @@
+255: 15
+254: 16
+start: sta 253
+lda 255
+sta 252
+lda 254
+sta 251
+loop: lda 252
+subi 0
+bez out
+subi 1
+sta 252
+lda 251
+ldb 253
+add
+sta 253
+j loop
+out: lda 253
+out
+hlt
+
+push: mvsa
+subi 1
+mvas
+
+
+ldai 15
+stasp
