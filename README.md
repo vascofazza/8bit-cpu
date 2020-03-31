@@ -18,7 +18,7 @@ This repository contains pictures, schematics, and code for this project and its
 
 ## Architecture
 
-The MK1 CPU is composed of several modules, all connecter though a common 8-bit BUS, the status of each module is shown by dedicated LEDs. 
+The MK1 CPU is composed of several modules, all connected trough a common 8-bit BUS, the status of each module is shown by dedicated LEDs. 
 
 - The clock module is designed to allow step-by-step execution; in automatic mode the clock speed can be adjusted from 1Hz up to 32KHz.
 - The computer programs are stored in RAM and the CPU can be programmed both manually, by inserting binary machine code through dip-switches, and automatically via a USB PC interface. 
