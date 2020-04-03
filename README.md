@@ -14,7 +14,8 @@ This repository contains pictures, schematics, and code for this project and its
 
 * V 1.0 in action:
 
-[VIDEO]
+VIDEO:
+![MK1 Computer - home-made Programmable 8bit CPUh simulation](http://img.youtube.com/vi/R_gflIunANo/0.jpg)](http://www.youtube.com/watch?v=R_gflIunANo "MK1 Computer - home-made Programmable 8bit CPU")
 
 ## Architecture
 
