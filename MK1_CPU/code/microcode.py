@@ -3,86 +3,98 @@ import argparse
 from io import BytesIO
 import sys
 
-ver = 0.1
+_VERSION = 2.0
 
-HLT = 0b100000000000000000000000  # Halt clock
-MI  = 0b010000000000000000000000  # Memory address register in
-RI  = 0b001000000000000000000000  # RAM data in
-RO  = 0b000100000000000000000000  # RAM data out
-IO  = 0b000010000000000000000000  # Instruction register out
-II  = 0b000001000000000000000000  # Instruction register in
-AI  = 0b000000100000000000000000  # A register in
-AO  = 0b000000010000000000000000  # A register out
-EO  = 0b000000001000000000000000  # ALU out
-SU  = 0b000000000100000000000000  # ALU subtract
-BI  = 0b000000000010000000000000  # B register in
-OI  = 0b000000000001000000000000  # Output register in
-CE  = 0b000000000000100000000000  # Program counter enable
-CO  = 0b000000000000010000000000  # Program counter out
-J   = 0b000000000000001000000000  # Jump (program counter in)
-FI  = 0b000000000000000100000000  # Flags in
-OR  = 0b000000000000000010000000  # ALU OR mode
-AND = 0b000000000000000001000000  # ALU AND mode
-SHF = 0b000000000000000000100000  # REG A SHIFT mode
-ROT = 0b000000000000000000010000  # REG A ROTATE mode
-RGT = 0b000000000000000000001000  # Right SHIFT or ROTATE
-STK = 0b000000000000000000000100  # Memory Stack address space
-SI  = 0b000000000000000000000010  # Stack data in
-SO  = 0b000000000000000000000001  # Stack data out
-BO  = AND|OR if ver == 0.1 else None
-
-if ver == 0.1:
-    ROT |= SHF
+HLT = 0b10000000000000000000000000000000  # Halt clock
+STK = 0b01000000000000000000010000000000  # Memory Stack address space
+PE  = 0b00100000000000000000000000000000  # Program counter enable
+AI  = 0b00010000000000000000000000000000  # A register in
+BI  = 0b00001000000000000000000000000000  # B register in
+CI  = 0b00011000000000000000000000000000  # C register in
+DI  = 0b00000100000000000000000000000000  # D register in
+SI  = 0b00010100000000000000000000000000  # StakPointer register in
+EI  = 0b00001100000000000000000000000000  # ALU register in
+PI  = 0b00011100000000000000000000000000  # Program counter in
+MI  = 0b00000010000000000000000000000000  # Memory address register in
+RI  = 0b00000001000000000000000000000000  # RAM data in
+II  = 0b00000000100000000000000000000000  # Instruction register in
+OI  = 0b00000000010000000000000000000000  # Output register in
+XI  = 0b00000000001000000000000000000000  # External Interface in
+AO  = 0b00000000000100000000000000000000  # A register out
+BO  = 0b00000000000010000000000000000000  # B register out
+CO  = 0b00000000000110000000000000000000  # C register out
+DO  = 0b00000000000001000000000000000000  # D register out
+PO  = 0b00000000000101000000000000000000  # Program Counter out
+SO  = 0b00000000000011000000000000000000  # StackPointer register out
+EO  = 0b00000000000111000000000000000000  # ALU register out
+RO  = 0b00000000000000100000000000000000  # RAM data out
+IO  = 0b00000000000000010000000000000000  # Instruction register out
+SUB = 0b00000000000000001000000000000000  # ALU subtract mode
+OR  = 0b00000000000000000100000000000000  # ALU OR mode
+AND = 0b00000000000000001100000000000000  # ALU AND mode
+SHF = 0b00000000000000000010000000000000  # REG A SHIFT mode
+ROT = 0b00000000000000001010000000000000  # REG A ROTATE mode
+RGT = 0b00000000000000000110000000000000  # Right SHIFT or ROTATE
+NOT = 0b00000000000000001110000000000000  # ALU NOT mode
+FI  = 0b00000000000000000001000000000000  # Flags in
+SU  = 0b00000000000000000000100000000000  # StackPointer count UP
+SD  = 0b00000000000000000000010000000000  # StackPointer count DOWN
+U0  = 0b00000000000000000000001000000000  # X-USR sig 0
+U1  = 0b00000000000000000000000100000000  # X-USR sig 1
+E0  = 0b00000000000000000000000010000000  # X-Enable 0
+E1  = 0b00000000000000000000000001000000  # X-Enable 1
+HL  = 0b00000000000000000000000000100000  # HL address mode
+RST = 0b00000000000000000000000000000001  # Reset step counter
 
 ucode_template = {
-    0b000000 : ('noop', [MI|CO, RO|II,  RO|II|CE,  0,              0,           0,    -1, -1], False),
-    0b000001 : ('hlt',  [MI|CO, RO|II,  RO|II|CE,  HLT,            0,           0,    -1, -1], False),
+    0b000000 : ('noop', [MI|CO, RO|II,  HL|RO|II|CE,  0,              0,           0,    -1, -1], False),
+    0b000001 : ('hlt',  [MI|CO, RO|II,  HL|RO|II|CE,  HLT,            0,           0,    -1, -1], False),
 
-    0b000010 : ('add',  [MI|CO, RO|II,  RO|II|CE,  EO|AI|FI,       0,           0,    -1, -1], False),
-    0b000011 : ('addi', [MI|CO, RO|II,  RO|II|CE,  BI|IO,          EO|AI|FI,    0,    -1, -1], True ), #x
-    0b000100 : ('sub',  [MI|CO, RO|II,  RO|II|CE,  EO|AI|SU|FI,    0,           0,    -1, -1], False),
-    0b000101 : ('subi', [MI|CO, RO|II,  RO|II|CE,  BI|IO,          EO|SU|AI|FI, 0,    -1, -1], True ), #x
-    0b000110 : ('and',  [MI|CO, RO|II,  RO|II|CE,  EO|AI|AND|FI,   0,           0,    -1, -1], False),
-    0b000111 : ('andi', [MI|CO, RO|II,  RO|II|CE,  BI|IO,          EO|AND|AI|FI,0,    -1, -1], True ), #x
-    0b001000 : ('or',   [MI|CO, RO|II,  RO|II|CE,  EO|AI|OR|FI,    0,           0,    -1, -1], False),
-    0b001001 : ('ori',  [MI|CO, RO|II,  RO|II|CE,  BI|IO,          EO|OR|AI|FI, 0,    -1, -1], True ), #x
+    0b000010 : ('add',  [MI|CO, RO|II,  HL|RO|II|CE,  EO|AI|FI,       0,           0,    -1, -1], False),
+    0b000011 : ('addi', [MI|CO, RO|II,  HL|RO|II|CE,  BI|IO,          EO|AI|FI,    0,    -1, -1], True ), #x
+    0b000100 : ('sub',  [MI|CO, RO|II,  HL|RO|II|CE,  EO|AI|SU|FI,    0,           0,    -1, -1], False),
+    0b000101 : ('subi', [MI|CO, RO|II,  HL|RO|II|CE,  BI|IO,          EO|SU|AI|FI, 0,    -1, -1], True ), #x
+    0b000110 : ('and',  [MI|CO, RO|II,  HL|RO|II|CE,  EO|AI|AND|FI,   0,           0,    -1, -1], False),
+    0b000111 : ('andi', [MI|CO, RO|II,  HL|RO|II|CE,  BI|IO,          EO|AND|AI|FI,0,    -1, -1], True ), #x
+    0b001000 : ('or',   [MI|CO, RO|II,  HL|RO|II|CE,  EO|AI|OR|FI,    0,           0,    -1, -1], False),
+    0b001001 : ('ori',  [MI|CO, RO|II,  HL|RO|II|CE,  BI|IO,          EO|OR|AI|FI, 0,    -1, -1], True ), #x
 
-    0b001010 : ('sll',  [MI|CO, RO|II,  RO|II|CE,  SHF|AI,         0,           0,    -1, -1], False),
-    0b001011 : ('slr',  [MI|CO, RO|II,  RO|II|CE,  SHF|RGT|AI,     0,           0,    -1, -1], False),
-    0b001100 : ('rll',  [MI|CO, RO|II,  RO|II|CE,  ROT|AI,         0,           0,    -1, -1], False),
-    0b001101 : ('rlr',  [MI|CO, RO|II,  RO|II|CE,  ROT|RGT|AI,     0,           0,    -1, -1], False),
+    0b001010 : ('sll',  [MI|CO, RO|II,  HL|RO|II|CE,  SHF|AI,         0,           0,    -1, -1], False),
+    0b001011 : ('slr',  [MI|CO, RO|II,  HL|RO|II|CE,  SHF|RGT|AI,     0,           0,    -1, -1], False),
+    0b001100 : ('rll',  [MI|CO, RO|II,  HL|RO|II|CE,  ROT|AI,         0,           0,    -1, -1], False),
+    0b001101 : ('rlr',  [MI|CO, RO|II,  HL|RO|II|CE,  ROT|RGT|AI,     0,           0,    -1, -1], False),
 
-    0b010000 : ('lda',  [MI|CO, RO|II,  RO|II|CE,  IO|MI,          AI|RO,       0,    -1, -1], True ), #&x
-    0b010001 : ('ldai', [MI|CO, RO|II,  RO|II|CE,  IO|AI,          0,           0,    -1, -1], True ), #x
-    0b010010 : ('ldb',  [MI|CO, RO|II,  RO|II|CE,  IO|MI,          BI|RO,       0,    -1, -1], True ), #&x
-    0b010011 : ('ldbi', [MI|CO, RO|II,  RO|II|CE,  IO|BI,          0,           0,    -1, -1], True ), #x
-    0b010100 : ('ldasp',[MI|CO, RO|II,  RO|II|CE,  SO|MI,          AI|RO|STK,   0,    -1, -1], False),
-    0b010101 : ('ldbsp',[MI|CO, RO|II,  RO|II|CE,  SO|MI,          BI|RO|STK,   0,    -1, -1], False),
-    0b010110 : ('ldspi',[MI|CO, RO|II,  RO|II|CE,  IO|SI,          0,           0,    -1, -1], True ), #x
-    0b111000 : ('lda$', [MI|CO, RO|II,  RO|II|CE,  AO|MI,          AI|RO,       0,    -1, -1], False),
-    0b111001 : ('ldb$', [MI|CO, RO|II,  RO|II|CE,  BO|MI,          BI|RO,       0,    -1, -1], False),
+    0b010000 : ('lda',  [MI|CO, RO|II,  HL|RO|II|CE,  IO|MI,          AI|RO,       0,    -1, -1], True ), #&x
+    0b010001 : ('ldai', [MI|CO, RO|II,  HL|RO|II|CE,  IO|AI,          0,           0,    -1, -1], True ), #x
+    0b010010 : ('ldb',  [MI|CO, RO|II,  HL|RO|II|CE,  IO|MI,          BI|RO,       0,    -1, -1], True ), #&x
+    0b010011 : ('ldbi', [MI|CO, RO|II,  HL|RO|II|CE,  IO|BI,          0,           0,    -1, -1], True ), #x
+    0b010100 : ('ldasp',[MI|CO, RO|II,  HL|RO|II|CE,  SO|MI,          AI|RO|STK,   0,    -1, -1], False),
+    0b010101 : ('ldbsp',[MI|CO, RO|II,  HL|RO|II|CE,  SO|MI,          BI|RO|STK,   0,    -1, -1], False),
+    0b010110 : ('ldspi',[MI|CO, RO|II,  HL|RO|II|CE,  IO|SI,          0,           0,    -1, -1], True ), #x
+    0b111000 : ('lda$', [MI|CO, RO|II,  HL|RO|II|CE,  AO|MI,          AI|RO,       0,    -1, -1], False),
+    0b111001 : ('ldb$', [MI|CO, RO|II,  HL|RO|II|CE,  BO|MI,          BI|RO,       0,    -1, -1], False),
 
-    0b011001 : ('sta',  [MI|CO, RO|II,  RO|II|CE,  IO|MI,          AO|RI,       0,    -1, -1], True ), #&x
-    0b011010 : ('stb',  [MI|CO, RO|II,  RO|II|CE,  IO|MI,          BO|RI,       0,    -1, -1], True ), #&x
-    0b011011 : ('stsp', [MI|CO, RO|II,  RO|II|CE,  IO|MI,          SO|STK|RI,   0,    -1, -1], True ), #&x
-    0b011100 : ('stasp',[MI|CO, RO|II,  RO|II|CE,  SO|MI,          AO|STK|RI,   0,    -1, -1], False),
-    0b011101 : ('stbsp',[MI|CO, RO|II,  RO|II|CE,  SO|MI,          BO|STK|RI,   0,    -1, -1], False),
-    0b1000000: ('sta$', [MI|CO, RO|II,  RO|II|CE,  IO|MI,          RO|MI,       AO|RI,-1, -1], True ), #data in regA goes to address @ mem[x]
-    0b1000001: ('stb$', [MI|CO, RO|II,  RO|II|CE,  IO|MI,          RO|MI,       BO|RI,-1, -1], True ), #data in regB goes to address @ mem[x]
+    0b011001 : ('sta',  [MI|CO, RO|II,  HL|RO|II|CE,  IO|MI,          AO|RI,       0,    -1, -1], True ), #&x
+    0b011010 : ('stb',  [MI|CO, RO|II,  HL|RO|II|CE,  IO|MI,          BO|RI,       0,    -1, -1], True ), #&x
+    0b011011 : ('stsp', [MI|CO, RO|II,  HL|RO|II|CE,  IO|MI,          SO|STK|RI,   0,    -1, -1], True ), #&x
+    0b011100 : ('stasp',[MI|CO, RO|II,  HL|RO|II|CE,  SO|MI,          AO|STK|RI,   0,    -1, -1], False),
+    0b011101 : ('stbsp',[MI|CO, RO|II,  HL|RO|II|CE,  SO|MI,          BO|STK|RI,   0,    -1, -1], False),
+    0b1000000: ('sta$', [MI|CO, RO|II,  HL|RO|II|CE,  IO|MI,          RO|MI,       AO|RI,-1, -1], True ), #data in regA goes to address @ mem[x]
+    0b1000001: ('stb$', [MI|CO, RO|II,  HL|RO|II|CE,  IO|MI,          RO|MI,       BO|RI,-1, -1], True ), #data in regB goes to address @ mem[x]
 
-    0b110000 : ('mvab', [MI|CO, RO|II,  RO|II|CE,  BI|AO,          0,           0,    -1, -1], False),
-    0b110001 : ('mvba', [MI|CO, RO|II,  RO|II|CE,  BO|AI,          0,           0,    -1, -1], False),
-    0b110010 : ('mvsa', [MI|CO, RO|II,  RO|II|CE,  SO|AI,          0,           0,    -1, -1], False),
-    0b110011 : ('mvas', [MI|CO, RO|II,  RO|II|CE,  AO|SI,          0,           0,    -1, -1], False),
-    0b110100 : ('mvsb', [MI|CO, RO|II,  RO|II|CE,  SO|BI,          0,           0,    -1, -1], False),
-    0b110101 : ('mvbs', [MI|CO, RO|II,  RO|II|CE,  BO|SI,          0,           0,    -1, -1], False),
+    0b110000 : ('mvab', [MI|CO, RO|II,  HL|RO|II|CE,  BI|AO,          0,           0,    -1, -1], False),
+    0b110001 : ('mvba', [MI|CO, RO|II,  HL|RO|II|CE,  BO|AI,          0,           0,    -1, -1], False),
+    0b110010 : ('mvsa', [MI|CO, RO|II,  HL|RO|II|CE,  SO|AI,          0,           0,    -1, -1], False),
+    0b110011 : ('mvas', [MI|CO, RO|II,  HL|RO|II|CE,  AO|SI,          0,           0,    -1, -1], False),
+    0b110100 : ('mvsb', [MI|CO, RO|II,  HL|RO|II|CE,  SO|BI,          0,           0,    -1, -1], False),
+    0b110101 : ('mvbs', [MI|CO, RO|II,  HL|RO|II|CE,  BO|SI,          0,           0,    -1, -1], False),
 
-    0b100000 : ('j',    [MI|CO, RO|II,  RO|II|CE,  IO|J,           0,           0,    -1, -1], True ), #&x
-    0b100001 : ('jal',  [MI|CO, RO|II,  RO|II|CE,  SO|MI,          STK|CO|RI,   J|IO, -1, -1], True ), #&x
-    0b100010 : ('jsp',  [MI|CO, RO|II,  RO|II|CE,  SO|MI,          RO|STK|J,    0,    -1, -1], False),
-    0b100011 : ('bez',  [MI|CO, RO|II,  RO|II|CE,  0,              0,           0,    -1, -1], True ), #&x
-    0b100100 : ('bcf',  [MI|CO, RO|II,  RO|II|CE,  0,              0,           0,    -1, -1], True ), #&x
-    0b111111 : ('out',  [MI|CO, RO|II,  RO|II|CE,  AO|OI,          0,           0,    -1, -1], False)
+    0b100000 : ('j',    [MI|CO, RO|II,  HL|RO|II|CE,  IO|J,           0,           0,    -1, -1], True ), #&x
+    0b100001 : ('jal',  [MI|CO, RO|II,  HL|RO|II|CE,  SO|MI,          STK|CO|RI,   J|IO, -1, -1], True ), #&x
+    0b100010 : ('jsp',  [MI|CO, RO|II,  HL|RO|II|CE,  SO|MI,          RO|STK|J,    0,    -1, -1], False),
+    0b100011 : ('bez',  [MI|CO, RO|II,  HL|RO|II|CE,  0,              0,           0,    -1, -1], True ), #&x
+    0b100100 : ('bcf',  [MI|CO, RO|II,  HL|RO|II|CE,  0,              0,           0,    -1, -1], True ), #&x
+    0b111111 : ('out',  [MI|CO, RO|II,  HL|RO|II|CE,  AO|OI,          0,           0,    -1, -1], False)
     }
 
 def checkUCode():
