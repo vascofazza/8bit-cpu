@@ -1,6 +1,6 @@
-#define MI 12
-#define HL 10
-#define RI 11
+#define MI 10
+#define HL 11
+#define RI 12
 #define EN 13
 #define CLK A0
 #define RST A1
@@ -16,9 +16,10 @@ void setup() {
   pinMode(EN, OUTPUT);
   pinMode(CLK, INPUT);
   pinMode(RST, INPUT);
+  pinMode(CU_EN, OUTPUT);
 
-  DDRD |= B11111100;
-  DDRB |= B00000011;
+  DDRD &= ~B11111100;
+  DDRB &= ~B00000011;
 }
 
 void reset()
@@ -34,7 +35,7 @@ void clock()
 {
   pinMode(CLK, OUTPUT);
   digitalWrite(CLK, HIGH);
-  delay(5);
+  delay(1);
   digitalWrite(CLK, LOW);
   pinMode(CLK, INPUT);
 }
@@ -52,6 +53,16 @@ void disableClock()
   pinMode(CLK, INPUT);
 }
 
+void disable_cu()
+{
+  digitalWrite(CU_EN, HIGH);
+}
+
+void enable_cu()
+{
+  digitalWrite(CU_EN, LOW);
+}
+
 void enableOutput()
 {
   digitalWrite(EN, HIGH);
@@ -65,12 +76,12 @@ void disableOutput()
 void setAddress(byte address)
 {
   putOut(address);
-  delay(5);
+  delay(1);
   enableOutput();
   digitalWrite(MI, HIGH);
-  delay(5);
+  delay(1);
   digitalWrite(MI, LOW);
-  delay(5);
+  delay(1);
   disableOutput();
 }
 
@@ -78,7 +89,7 @@ void putOut(byte data)
 {
   PORTD = (PORTD & 0x3) | (data << 2);
   PORTB = (PORTB & 0xFC) | (data >> 6 & 0x3);
-  delay(5);
+  delay(1);
 }
 
 void writeInstruction(byte instr, byte data)
@@ -87,15 +98,15 @@ void writeInstruction(byte instr, byte data)
   putOut(instr);
   enableOutput();
   digitalWrite(RI, HIGH);
-  delay(5);
+  delay(1);
   digitalWrite(RI, LOW);
-  delay(5);
+  delay(1);
   digitalWrite(HL, HIGH);
   putOut(data);
   digitalWrite(RI, HIGH);
-  delay(5);
+  delay(1);
   digitalWrite(RI, LOW);
-  delay(5);
+  delay(1);
   digitalWrite(HL, LOW);
   disableOutput();
   
@@ -110,22 +121,24 @@ void loop() {
     Serial.write(0);
 
     reset();
+    disable_cu();
     for (int i = 0; i < 5; i++)
       clock();
 
-    delay(10);
+    delay(1);
     enableClock();
-    delay(10);
+    delay(1);
     for (int i = 0; i < p_size; i += 2)
     {
       setAddress(i / 2);
-      delay(5);
+      delay(1);
       writeInstruction(buffer[i], buffer[i + 1]);
-      delay(5);
+      delay(1);
     }
 
     disableClock();
     reset();
+    enable_cu();
   }
   disableOutput();
 
