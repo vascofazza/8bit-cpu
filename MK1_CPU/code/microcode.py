@@ -48,7 +48,7 @@ RST = 0b00000000000000000000000000000001  # Reset step counter
 
 register_map = {0: ('$a', AI, AO),
                 1: ('$b', BI, BO),
-                2: ('$a', CI, CO),
+                2: ('$c', CI, CO),
                 3: ('$d', DI, DO),
                 4: ('$sp', SI, SO),
                 5: ('$pc', PI, PO),
@@ -141,7 +141,7 @@ ucode_template[0b10000100] = ('hlt', [HLT, 0,  0,  0, 0, 0, 0, 0], False)
 #op $a $b
 #11 - op - rs - rd
 ucode_template.update({
-    (0b11 << 6) + (op << 4) + (first << 2) + second : ('$s %s, %s'%(alu_op_map[op][0] + register_map[first][0], register_map[second][0]), [MI|CO, RO|II,  HL|RO|II|PE,  register_map[first][2]|EI, register_map[second][1]|EO|FI|alu_op_map[op][1], RST, 0, 0], False)
+    (0b11 << 6) + (op << 4) + (first << 2) + second : ('%s %s, %s'%(alu_op_map[op][0], register_map[first][0], register_map[second][0]), [MI|CO, RO|II,  HL|RO|II|PE,  register_map[first][2]|EI, register_map[second][1]|EO|FI|alu_op_map[op][1], RST, 0, 0], False)
     for first in range(4) for second in range(4) for op in range(4)})
 
 def checkUCode():
@@ -277,7 +277,7 @@ def generate_microcode():
 
     with open("microcode.bin", 'wb') as out:
         #Program the 8 high-order bits of microcode into the first 128 bytes of EEPROM
-        for address in range(65536):
+        for address in range(131072):
             flags       = (address & 0b00111100000000000) >> 11
             byte_sel    = (address & 0b11000000000000000) >> 15
             instruction = (address & 0b00000011111111000) >> 3
@@ -297,6 +297,10 @@ def generate_microcode():
                 write(address, ucode[flags][instruction][1][step] >> 0, out)
             else:
                 write(address, 0, out)
+
+        with open("microcode.txt", 'w') as out:
+            for mnemonic, opcode in sorted(instruction_decode.items()):
+                print(mnemonic, format(opcode, '08b'), sep='\t', file=out)
 
         print("done")
 
