@@ -1,0 +1,4 @@
+(fp_lib_table
+  (lib (name Arduino)(type KiCad)(uri "/Users/fscozzafava/Library/Mobile Documents/com~apple~CloudDocs/computer project/programming_interface/arduino-kicad-library/Arduino.pretty")(options "")(descr ""))
+  (lib (name 8bit-custom-footprints)(type KiCad)(uri "/Users/fscozzafava/Library/Mobile Documents/com~apple~CloudDocs/computer project/8bit-computer/8bit-custom-footprints.pretty")(options "")(descr ""))
+)
