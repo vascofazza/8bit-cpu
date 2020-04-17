@@ -23,6 +23,7 @@ This repository contains pictures, schematics, and code for this project and its
 * V 1.0 in action:
 
 **DEMO VIDEO**
+
 [![MK1 Computer - home-made Programmable 8bit CPU](https://img.youtube.com/vi/R_gflIunANo/0.jpg)](https://www.youtube.com/watch?v=R_gflIunANo)
 
 ## Architecture
@@ -34,7 +35,7 @@ The MK1 CPU is composed of several modules, all connected trough a common 8-bit 
   - The Programming interface is designed to be used in conjunction with an **Arduino Nano** or the **Start9** programming board.
   - The **Start9** programming board allows the loading of multiple programs stored on an on-board flash memory without the aid of an external computer device.
 - The Addressable memory space is 1024 byte, data, stack and code spaces are separated, the code address space is not writable. 
-- The instructions are variable-length (see **instruction-set [here](https://github.com/vascofazza/8bit-cpu/tree/master/MK1_CPU/programs/libraries/mk1.cpu)**) 1 or 2 bytes long (first byte for the opcode, the second one for the argument), there are 4 general purpose registers (`A`, `B`, `C`, `D`) and a  `stack pointer` register for subroutine calls.
+- The instructions are variable-length (see **instruction-set [here](https://github.com/vascofazza/8bit-cpu/tree/master/MK1_CPU/programs/lib/mk1.cpu)**) 1 or 2 bytes long (first byte for the opcode, the second one for the argument), there are 4 general purpose registers (`A`, `B`, `C`, `D`) and a  `stack pointer` register for subroutine calls.
 - The **A**rithmetic **L**ogic **U**nit has a dedicated register for the second operand and supports the following operations:
   - Addition
   - Subtraction
