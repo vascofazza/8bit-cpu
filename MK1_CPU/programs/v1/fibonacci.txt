@@ -1,9 +1,0 @@
-ldai 1
-ldbi 1
-loop: out
-stasp
-add
-ldbsp
-bcf end
-j loop
-end: hlt

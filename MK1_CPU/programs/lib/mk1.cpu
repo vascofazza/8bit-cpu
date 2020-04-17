@@ -1,0 +1,78 @@
+#cpudef
+{
+    #bits 8
+
+    #labelalign 2
+
+    #tokendef reg
+    {
+        $a   = 0
+        $b   = 1
+        $c   = 2
+        $d   = 3
+        $sp  = 4
+        $pc  = 5
+        $out = 6
+    }
+
+    #tokendef alu_op
+    {
+        add = 0
+        sub = 1
+        or  = 2
+        and = 3
+    }
+
+    nop -> 16'0x00
+    hlt -> 0b01111111 @ 0x00
+
+    mov {src: reg} {dst: reg} -> 0b00 @ src[2:0] @ dst[2:0] @ 0x00
+    ldi {dst: reg} {value} -> { assert(value <= 0xff), 0b00 @ 0b111 @ dst[2:0] @ value[7:0] }
+    out	{value: reg} -> 0b00 @ value[2:0] @ 0b110 @ 0x00
+    out {value} -> { assert(value <= 0xff), 0b00 @ 0b111 @ 0b100[2:0] @ value[7:0] }
+
+    j {address} -> { assert(address <= 512), 0b00 @ 0b111 @ 3'5 @ (address/2)[7:0] }
+
+    ld {dst: reg} [{addr: reg}] -> 0b01 @ dst[2:0] @ addr[2:0] @ 0x00
+    ld {dst: reg} {address} -> { assert(address <= 512), 0b01 @ dst[2:0] @ 0b111 @ (address/2)[7:0] }
+
+    st {src: reg} [{addr: reg}] -> 0b10 @ src[2:0] @ addr[2:0] @ 0x00
+    st {src: reg} {address} -> { assert(address <= 512), 0b10 @ src[2:0] @ 0b111 @ (address/2)[7:0] }
+
+    {op: alu_op} {operand_1: reg} {operand_2: reg} -> 0b11 @ op[1:0] @ operand_1[1:0] @ operand_2[1:0] @ 0x00
+    {op: alu_op}i {value: i8} {dst: reg} -> { assert(value <= 0xff), 0b1011 @ op[1:0] @ dst[1:0] @ value[7:0] }
+
+    not ->	0b01111010 @ 0x00
+    rll	->	0b01111101 @ 0x00
+    rlr	->	0b01111110 @ 0x00
+    sll	->	0b01111011 @ 0x00
+    slr	->	0b01111100 @ 0x00
+
+    cmp $b -> 0b10101110 @ 0x00
+    cmp $c -> 0b10110110 @ 0x00
+    cmp $d -> 0b10111110 @ 0x00
+    cmp {value} -> { assert(value <= 0xff), 0b10000110 @ 0x00 }
+
+    push {data: reg} -> 0b10 @ data[2:0] @ 0b100 @0x00
+    pop {data: reg} -> 0b01 @ data[2:0] @ 0b100 @0x00
+    ret -> 0b01 @ 3'5 @ 0b100 @0x00
+
+    jal {address} -> { assert(address <= 512), 0b10 @ 3'5 @ 0b100 @ (address/2)[7:0] }
+    jc	{address} -> { assert(address <= 512), 0b00110111 @ (address/2)[7:0] }
+    jz	{address} -> { assert(address <= 512), 0b00111111 @ (address/2)[7:0] }
+
+    exr 0	-> 0b01111000 @ 0x00
+    exr 1	-> 0b01111001 @ 0x00
+    exw 0 0	-> 0b00000111 @ 0x00
+    exw 0 1	-> 0b00001111 @ 0x00
+    exw 0 2 -> 0b10001110 @ 0x00
+    exw 0 3 -> 0b10010110 @ 0x00
+
+    exw 1 0	-> 0b00010111 @ 0x00
+    exw 1 1	-> 0b00011111 @ 0x00
+    exw 1 2 -> 0b10011110 @ 0x00
+    exw 2 3 -> 0b10100110 @ 0x00
+
+    je0	{address} -> { assert(address <= 512), 0b00100111 @ (address/2)[7:0] }
+    je1	{address} -> { assert(address <= 512), 0b00101111 @ (address/2)[7:0] }
+}
