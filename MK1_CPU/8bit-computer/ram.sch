@@ -992,11 +992,9 @@ $EndComp
 Wire Wire Line
 	2400 700  2400 550 
 Wire Wire Line
-	2400 550  3850 550 
+	2400 550  2850 550 
 Connection ~ 3850 550 
 Connection ~ 5500 1450
-Wire Wire Line
-	5500 1450 8900 1450
 Wire Wire Line
 	4700 5500 4700 6600
 Connection ~ 3450 1450
@@ -1301,4 +1299,29 @@ Wire Wire Line
 Connection ~ 4650 4900
 Wire Wire Line
 	4650 4900 4750 4900
+$Comp
+L Device:C C?
+U 1 1 5EFCB8CD
+P 2850 850
+AR Path="/5B55F546/5EFCB8CD" Ref="C?"  Part="1" 
+AR Path="/5B551E96/5EFCB8CD" Ref="C45"  Part="1" 
+F 0 "C45" H 2875 950 50  0000 L CNN
+F 1 "0.01uf" H 2875 750 50  0000 L CNN
+F 2 "Capacitor_THT:C_Disc_D4.3mm_W1.9mm_P5.00mm" H 2888 700 50  0001 C CNN
+F 3 "" H 2850 850 50  0001 C CNN
+	1    2850 850 
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2850 700  2850 550 
+Connection ~ 2850 550 
+Wire Wire Line
+	2850 550  3850 550 
+Wire Wire Line
+	2850 1000 2850 1400
+Wire Wire Line
+	2850 1400 2400 1400
+Connection ~ 2400 1400
+Wire Wire Line
+	5500 1450 8900 1450
 $EndSCHEMATC

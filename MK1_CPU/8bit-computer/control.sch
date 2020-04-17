@@ -285,12 +285,6 @@ Wire Wire Line
 Wire Wire Line
 	4600 4350 4000 4350
 Wire Wire Line
-	3200 3300 3400 3300
-Connection ~ 3400 3300
-Wire Wire Line
-	3200 3500 3500 3500
-Connection ~ 3500 3500
-Wire Wire Line
 	3400 1950 3400 3000
 Wire Wire Line
 	3500 2050 3500 3050
@@ -306,10 +300,6 @@ Wire Wire Line
 	3700 4050 3700 6600
 Wire Wire Line
 	3600 3950 3600 6500
-Wire Wire Line
-	3400 3300 3400 3750
-Wire Wire Line
-	3500 3500 3500 3850
 Wire Wire Line
 	3300 850  4600 850 
 Wire Wire Line
@@ -637,7 +627,7 @@ Wire Wire Line
 Wire Wire Line
 	4500 3050 5600 3050
 Connection ~ 5600 3050
-Text HLabel 10650 6950 2    60   Output ~ 0
+Text HLabel 9950 9750 2    60   Output ~ 0
 RGT
 Text HLabel 10650 2650 2    60   Output ~ 0
 SI
@@ -683,11 +673,7 @@ F 3 "" H 5150 6950 60  0001 C CNN
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	2850 4350 2850 5250
-Wire Wire Line
 	1200 8200 1200 8800
-Wire Wire Line
-	2400 6650 2850 6650
 Connection ~ 2300 7800
 Wire Wire Line
 	2300 7800 2300 8200
@@ -741,7 +727,7 @@ Wire Wire Line
 Wire Wire Line
 	1600 7250 1600 7350
 Wire Wire Line
-	950  8450 950  8350
+	950  8450 950  8400
 $Comp
 L power:GND #PWR099
 U 1 1 5B6368B1
@@ -969,8 +955,6 @@ Wire Wire Line
 Wire Wire Line
 	800  4700 800  2850
 Wire Wire Line
-	700  6750 700  5900
-Wire Wire Line
 	5850 6050 5850 8650
 $Comp
 L 8bit-computer-rescue:74HCT04 U63
@@ -1193,8 +1177,6 @@ Wire Wire Line
 	6900 6650 7250 6650
 Wire Wire Line
 	8500 9650 8500 9150
-Wire Wire Line
-	8600 9750 9200 9750
 Wire Wire Line
 	8700 9850 9200 9850
 Wire Wire Line
@@ -1627,7 +1609,6 @@ Wire Wire Line
 Connection ~ 10450 9500
 Wire Wire Line
 	10450 9500 10650 9500
-NoConn ~ 9200 9750
 NoConn ~ 9200 9850
 NoConn ~ 9200 9950
 NoConn ~ 9200 10050
@@ -2663,36 +2644,6 @@ Wire Wire Line
 	1750 900  2100 900 
 Wire Wire Line
 	1750 1050 2100 1050
-Wire Wire Line
-	900  6050 900  5900
-$Comp
-L Jumper:SolderJumper_2_Open JP1
-U 1 1 76AA61F3
-P 2100 6050
-F 0 "JP1" H 2100 6255 50  0000 C CNN
-F 1 "RST_EN" H 2100 6164 50  0000 C CNN
-F 2 "Jumper:SolderJumper-2_P1.3mm_Open_RoundedPad1.0x1.5mm" H 2100 6050 50  0001 C CNN
-F 3 "~" H 2100 6050 50  0001 C CNN
-	1    2100 6050
-	1    0    0    -1  
-$EndComp
-Wire Wire Line
-	2250 6050 5850 6050
-Wire Wire Line
-	900  6050 1950 6050
-$Comp
-L Jumper:SolderJumper_2_Bridged JP2
-U 1 1 771B8E30
-P 2850 5400
-F 0 "JP2" H 2850 5605 50  0000 C CNN
-F 1 "6-STAGES" H 2850 5514 50  0000 C CNN
-F 2 "Jumper:SolderJumper-2_P1.3mm_Bridged_RoundedPad1.0x1.5mm" H 2850 5400 50  0001 C CNN
-F 3 "~" H 2850 5400 50  0001 C CNN
-	1    2850 5400
-	0    -1   -1   0   
-$EndComp
-Wire Wire Line
-	2850 6650 2850 6400
 $Comp
 L Connector:TestPoint TP?
 U 1 1 77E89F8B
@@ -2711,94 +2662,13 @@ Wire Wire Line
 Connection ~ 8500 600 
 Wire Wire Line
 	8500 600  10200 600 
-$Comp
-L Device:R R25
-U 1 1 78B5F375
-P 2650 6400
-F 0 "R25" V 2730 6400 50  0000 C CNN
-F 1 "10K" V 2650 6400 50  0000 C CNN
-F 2 "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal" V 2580 6400 50  0001 C CNN
-F 3 "" H 2650 6400 50  0001 C CNN
-	1    2650 6400
-	0    -1   -1   0   
-$EndComp
-Wire Wire Line
-	2800 6400 2850 6400
-Connection ~ 2850 6400
-Wire Wire Line
-	2850 6400 2850 5550
-$Comp
-L power:VCC #PWR0123
-U 1 1 78CAE6D6
-P 2450 6300
-F 0 "#PWR0123" H 2450 6150 50  0001 C CNN
-F 1 "VCC" H 2450 6450 50  0000 C CNN
-F 2 "" H 2450 6300 50  0001 C CNN
-F 3 "" H 2450 6300 50  0001 C CNN
-	1    2450 6300
-	1    0    0    -1  
-$EndComp
-Wire Wire Line
-	2450 6300 2450 6400
-Wire Wire Line
-	2450 6400 2500 6400
 NoConn ~ 9000 12000
 Wire Wire Line
 	8350 6850 9250 6850
 Wire Wire Line
-	700  6750 1200 6750
-$Comp
-L 8bit-computer-rescue:74HCT08 U74
-U 2 1 60AB6A7F
-P 1800 6750
-F 0 "U74" H 1800 7116 50  0000 C CNN
-F 1 "74HCT08" H 1800 7025 50  0000 C CNN
-F 2 "Package_DIP:DIP-14_W7.62mm" H 1800 6750 50  0001 C CNN
-F 3 "" H 1800 6750 50  0001 C CNN
-	2    1800 6750
-	-1   0    0    -1  
-$EndComp
-Wire Wire Line
 	2400 8800 2600 8800
-Connection ~ 2300 7450
-Wire Wire Line
-	2300 7050 2300 7450
-Wire Wire Line
-	2500 6850 2400 6850
-Wire Wire Line
-	2500 7050 2500 6850
-Wire Wire Line
-	2300 7050 2500 7050
-$Comp
-L 8bit-computer-rescue:74HCT08 U74
-U 4 1 5F44AF9F
-P 2600 3400
-F 0 "U74" H 2600 3766 50  0000 C CNN
-F 1 "74HCT08" H 2600 3675 50  0000 C CNN
-F 2 "Package_DIP:DIP-14_W7.62mm" H 2600 3400 50  0001 C CNN
-F 3 "" H 2600 3400 50  0001 C CNN
-	4    2600 3400
-	-1   0    0    -1  
-$EndComp
-$Comp
-L 8bit-computer-rescue:74HCT04 U63
-U 4 1 5B624D8F
-P 1600 3850
-F 0 "U63" H 1795 3965 50  0000 C CNN
-F 1 "74HCT04" H 1790 3725 50  0000 C CNN
-F 2 "Package_DIP:DIP-14_W7.62mm" H 1600 3850 50  0001 C CNN
-F 3 "" H 1600 3850 50  0001 C CNN
-	4    1600 3850
-	0    1    1    0   
-$EndComp
 Wire Wire Line
 	3300 1850 3300 2950
-Wire Wire Line
-	1600 3400 2000 3400
-Wire Wire Line
-	1600 4350 1600 4300
-Wire Wire Line
-	1600 4350 2850 4350
 $Comp
 L 8bit-computer-rescue:74HCT86 U23
 U 2 1 60E78EC5
@@ -2834,14 +2704,10 @@ Wire Wire Line
 	1050 3000 3400 3000
 Connection ~ 3400 3000
 Wire Wire Line
-	3400 3000 3400 3300
-Wire Wire Line
 	1100 1050 1100 3050
 Wire Wire Line
 	1100 3050 3500 3050
 Connection ~ 3500 3050
-Wire Wire Line
-	3500 3050 3500 3500
 Wire Wire Line
 	9500 11450 9500 13800
 Wire Wire Line
@@ -2893,10 +2759,7 @@ Wire Wire Line
 Wire Wire Line
 	3150 13800 9500 13800
 Wire Wire Line
-	900  6050 550  6050
-Wire Wire Line
 	550  6050 550  1550
-Connection ~ 900  6050
 Wire Wire Line
 	550  1550 2100 1550
 Wire Wire Line
@@ -2950,4 +2813,48 @@ Wire Wire Line
 	9350 9650 9950 9650
 Wire Wire Line
 	8950 3750 8950 3850
+$Comp
+L Device:C C44
+U 1 1 5E9FDDA2
+P 650 6350
+F 0 "C44" H 675 6450 50  0000 L CNN
+F 1 "0.01µF" H 675 6250 50  0000 L CNN
+F 2 "Capacitor_THT:C_Disc_D4.3mm_W1.9mm_P5.00mm" H 688 6200 50  0001 C CNN
+F 3 "" H 650 6350 50  0001 C CNN
+	1    650  6350
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	650  6200 650  6050
+Wire Wire Line
+	650  6500 650  8400
+Wire Wire Line
+	650  8400 950  8400
+Connection ~ 950  8400
+Wire Wire Line
+	950  8400 950  8350
+Wire Wire Line
+	3400 3000 3400 3750
+Wire Wire Line
+	3500 3050 3500 3850
+Wire Wire Line
+	2300 6750 2300 7450
+Connection ~ 2300 7450
+Connection ~ 650  6050
+Wire Wire Line
+	650  6050 550  6050
+Wire Wire Line
+	650  6050 700  6050
+Wire Wire Line
+	900  5900 900  6750
+Wire Wire Line
+	900  6750 2300 6750
+Wire Wire Line
+	700  5900 700  6050
+Connection ~ 700  6050
+Wire Wire Line
+	700  6050 5850 6050
+Wire Wire Line
+	8600 9750 9950 9750
+NoConn ~ 10650 6950
 $EndSCHEMATC

@@ -516,14 +516,11 @@ Wire Wire Line
 Wire Wire Line
 	10000 2600 10150 2600
 Wire Wire Line
-	8600 3050 10000 3050
+	8600 3050 9400 3050
 Wire Wire Line
 	7400 1800 7400 2850
 Wire Wire Line
 	10000 3050 10000 4200
-Connection ~ 10000 3050
-Wire Wire Line
-	10000 3050 10150 3050
 Wire Wire Line
 	7100 2000 7100 4100
 $Comp
@@ -754,7 +751,7 @@ F 3 "" H 7250 3350 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	7250 3250 7250 3350
+	7250 3250 7250 3300
 Wire Wire Line
 	7250 2950 7250 2850
 Wire Wire Line
@@ -931,4 +928,34 @@ Wire Wire Line
 	2050 3250 2050 4650
 Wire Wire Line
 	1950 3250 1950 4750
+Connection ~ 10000 3050
+Wire Wire Line
+	10000 3050 10150 3050
+$Comp
+L Device:C C47
+U 1 1 5F13FC24
+P 9400 3250
+F 0 "C47" H 9425 3350 50  0000 L CNN
+F 1 "0.01" H 9425 3150 50  0000 L CNN
+F 2 "Capacitor_THT:C_Disc_D4.3mm_W1.9mm_P5.00mm" H 9438 3100 50  0001 C CNN
+F 3 "" H 9400 3250 50  0001 C CNN
+	1    9400 3250
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	9400 3400 9400 3500
+Wire Wire Line
+	9400 3100 9400 3050
+Connection ~ 9400 3050
+Wire Wire Line
+	9400 3050 10000 3050
+Wire Wire Line
+	7250 3300 9100 3300
+Wire Wire Line
+	9100 3300 9100 3500
+Wire Wire Line
+	9100 3500 9400 3500
+Connection ~ 7250 3300
+Wire Wire Line
+	7250 3300 7250 3350
 $EndSCHEMATC
