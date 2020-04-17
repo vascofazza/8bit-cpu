@@ -8,13 +8,17 @@ During the past month, I designed and built a programmable 8-bit CPU from scratc
 
 This repository contains pictures, schematics, and code for this project and its companion boards.
 
+* V 1.0 assembled:
+
+<img src="MK1_CPU/images/8bit-computer_v1.jpg" style="zoom:15%;" />
+
 * V 2.0b assembled:
 
 <img src="MK1_CPU/images/8bit-computer_v2.jpg" style="zoom:15%;" />
 
-- Helix Display Interface:
+- Helix Display Interface in action:
 
-<img src="helix_display_interface/images/hello_world.gif" style="zoom:15%;" />
+<img src="helix_display_interface/images/hello_world.gif"/>
 
 * V 1.0 in action:
 
