@@ -279,10 +279,10 @@ Wire Wire Line
 Wire Wire Line
 	3150 9800 3150 9900
 $Comp
-L Device:CP1 C1
+L Device:CP1 C2
 U 1 1 5B64AF9C
 P 7550 9000
-F 0 "C1" H 7575 9100 50  0000 L CNN
+F 0 "C2" H 7575 9100 50  0000 L CNN
 F 1 "10µF" H 7575 8900 50  0000 L CNN
 F 2 "Capacitor_THT:CP_Radial_D5.0mm_P2.00mm" H 7550 9000 50  0001 C CNN
 F 3 "" H 7550 9000 50  0001 C CNN
@@ -736,9 +736,7 @@ F10 "IR_4" O L 950 6050 60
 F11 "IR_5" O L 950 6150 60 
 F12 "IR_6" O L 950 6250 60 
 F13 "IR_7" O L 950 6350 60 
-F14 "~IO" I L 950 5200 60 
 F15 "II" I L 950 5300 60 
-F16 "HL" I L 950 5100 60 
 F17 "IR_3" O L 950 5950 60 
 F18 "IR_2" O L 950 5850 60 
 F19 "IR_1" O L 950 5750 60 
@@ -942,7 +940,6 @@ F1 "control.sch" 60
 F2 "HLT" O R 4150 5400 60 
 F3 "RI" O R 4150 6650 60 
 F4 "~RO" O R 4150 6550 60 
-F5 "~IO" O L 2950 5700 60 
 F6 "~AO" O L 2950 7750 60 
 F7 "~EO" O R 4150 7000 60 
 F8 "SU" O R 4150 5800 60 
@@ -1002,12 +999,6 @@ Text Label 1050 8700 2    60   ~ 0
 CLR
 Wire Wire Line
 	1150 800  950  800 
-Wire Wire Line
-	950  800  950  550 
-Wire Wire Line
-	950  550  4350 550 
-Wire Wire Line
-	4350 550  4350 5400
 Wire Wire Line
 	4350 5400 4150 5400
 Wire Wire Line
@@ -1130,13 +1121,13 @@ F 3 "" H 3300 2950 50  0001 C CNN
 $EndComp
 $Comp
 L 8bit-computer-rescue:74HCT32 U2
-U 1 1 7604CCE0
+U 2 1 7604CCE0
 P 5900 6800
 F 0 "U2" H 5900 7166 50  0000 C CNN
 F 1 "74HCT32" H 5900 7075 50  0000 C CNN
 F 2 "Package_DIP:DIP-14_W7.62mm" H 5900 6800 50  0001 C CNN
 F 3 "" H 5900 6800 50  0001 C CNN
-	1    5900 6800
+	2    5900 6800
 	0    -1   -1   0   
 $EndComp
 Wire Wire Line
@@ -1192,14 +1183,14 @@ Wire Wire Line
 Wire Wire Line
 	850  4300 950  4300
 $Comp
-L 8bit-computer-rescue:74HCT32 U1
-U 4 1 760B125A
+L 8bit-computer-rescue:74HCT32 U2
+U 1 1 760B125A
 P 5300 6850
-F 0 "U1" H 5300 7216 50  0000 C CNN
+F 0 "U2" H 5300 7216 50  0000 C CNN
 F 1 "74HCT32" H 5300 7125 50  0000 C CNN
 F 2 "Package_DIP:DIP-14_W7.62mm" H 5300 6850 50  0001 C CNN
 F 3 "" H 5300 6850 50  0001 C CNN
-	4    5300 6850
+	1    5300 6850
 	0    -1   -1   0   
 $EndComp
 Wire Wire Line
@@ -1371,11 +1362,6 @@ Wire Wire Line
 Wire Wire Line
 	4250 8200 4150 8200
 Wire Wire Line
-	850  4750 850  5100
-Wire Wire Line
-	850  5100 950  5100
-Connection ~ 850  4750
-Wire Wire Line
 	950  5300 750  5300
 Wire Wire Line
 	750  5300 750  7200
@@ -1385,16 +1371,6 @@ Wire Wire Line
 	2300 7200 2300 5600
 Wire Wire Line
 	2300 5600 2950 5600
-Wire Wire Line
-	2950 5700 2400 5700
-Wire Wire Line
-	2400 5700 2400 7300
-Wire Wire Line
-	2400 7300 650  7300
-Wire Wire Line
-	650  7300 650  5200
-Wire Wire Line
-	650  5200 950  5200
 Wire Wire Line
 	1950 10550 2350 10550
 Wire Wire Line
@@ -1824,10 +1800,10 @@ $EndSheet
 Text Notes 5250 6300 3    60   ~ 0
 RI
 $Comp
-L Device:CP1 C43
+L Device:CP1 C1
 U 1 1 5EB37267
 P 7200 9000
-F 0 "C43" H 7225 9100 50  0000 L CNN
+F 0 "C1" H 7225 9100 50  0000 L CNN
 F 1 "10µF" H 7225 8900 50  0000 L CNN
 F 2 "Capacitor_THT:CP_Radial_D5.0mm_P2.00mm" H 7200 9000 50  0001 C CNN
 F 3 "" H 7200 9000 50  0001 C CNN
@@ -1891,4 +1867,44 @@ Wire Wire Line
 Connection ~ 1300 10950
 Wire Wire Line
 	7550 9500 7550 9400
+$Comp
+L 8bit-computer-rescue:74HCT32 U1
+U 4 1 5F8680A4
+P 3350 4300
+F 0 "U1" H 3350 4666 50  0000 C CNN
+F 1 "74HCT32" H 3350 4575 50  0000 C CNN
+F 2 "Package_DIP:DIP-14_W7.62mm" H 3350 4300 50  0001 C CNN
+F 3 "" H 3350 4300 50  0001 C CNN
+	4    3350 4300
+	-1   0    0    1   
+$EndComp
+Wire Wire Line
+	3950 4400 4350 4400
+Wire Wire Line
+	4350 4400 4350 5400
+Wire Wire Line
+	2750 4300 2250 4300
+Wire Wire Line
+	2250 4300 2250 1450
+Wire Wire Line
+	2250 1450 950  1450
+Wire Wire Line
+	950  1450 950  800 
+Wire Wire Line
+	4900 8600 4900 9000
+Wire Wire Line
+	4900 9000 2400 9000
+Wire Wire Line
+	2400 9000 2400 5750
+Wire Wire Line
+	2400 5750 2150 5750
+Wire Wire Line
+	2150 5750 2150 4650
+Wire Wire Line
+	2150 4650 4000 4650
+Wire Wire Line
+	4000 4650 4000 4200
+Wire Wire Line
+	4000 4200 3950 4200
+Connection ~ 4900 8600
 $EndSCHEMATC

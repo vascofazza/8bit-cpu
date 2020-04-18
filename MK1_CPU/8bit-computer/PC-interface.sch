@@ -118,14 +118,14 @@ F 3 "" H 2950 3750 50  0001 C CNN
 	-1   0    0    -1  
 $EndComp
 $Comp
-L 8bit-computer-rescue:74HCT04 U4
-U 6 1 68295FCC
+L 8bit-computer-rescue:74HCT04 U60
+U 1 1 68295FCC
 P 4550 4250
-F 0 "U4" H 4550 4565 50  0000 C CNN
+F 0 "U60" H 4550 4565 50  0000 C CNN
 F 1 "74HCT04" H 4550 4474 50  0000 C CNN
 F 2 "Package_DIP:DIP-14_W7.62mm" H 4550 4250 50  0001 C CNN
 F 3 "" H 4550 4250 50  0001 C CNN
-	6    4550 4250
+	1    4550 4250
 	-1   0    0    -1  
 $EndComp
 Wire Wire Line
@@ -280,10 +280,10 @@ Wire Wire Line
 	6250 5650 7000 5650
 NoConn ~ 6350 6700
 $Comp
-L Jumper:SolderJumper_2_Bridged JP3
+L Jumper:SolderJumper_2_Bridged JP1
 U 1 1 5EF7019F
 P 5950 2500
-F 0 "JP3" V 5996 2412 50  0000 R CNN
+F 0 "JP1" V 5996 2412 50  0000 R CNN
 F 1 "Arduino_VIN" V 5905 2412 50  0000 R CNN
 F 2 "Jumper:SolderJumper-2_P1.3mm_Bridged_RoundedPad1.0x1.5mm" H 5950 2500 50  0001 C CNN
 F 3 "~" H 5950 2500 50  0001 C CNN
