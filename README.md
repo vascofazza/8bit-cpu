@@ -22,7 +22,7 @@ This repository contains pictures, schematics, and code for this project and its
 
 * V 1.0 in action:
 
-**DEMO VIDEO**
+**DEMO VIDEO (YouTube)**
 
 [![MK1 Computer - home-made Programmable 8bit CPU](https://img.youtube.com/vi/R_gflIunANo/0.jpg)](https://www.youtube.com/watch?v=R_gflIunANo)
 
@@ -58,7 +58,8 @@ The MK1 CPU is composed of several modules, all connected trough a common 8-bit 
     - out_display.py: generates the binary output display EEPROM code.
     - uploader.py: uploads a binary MK1 program to the CPU.
     - mk1_computer_uploader/: Arduino programmer interface sketch.
-  - **programs/**: a collection of programs for the MK1 CPU plus the assembler definition (check out https://github.com/hlorenzi/customasm).
+  - **assembler/**: fork of the hlorenzi's assembler, improved and customized for the MK1
+  - **programs/**: a collection of programs for the MK1 CPU plus the assembler definition
 - **start9_programming_interface/**: 
   - **programming_interface/**: KiCad project, schematics and PCB design of the **Start9** programming board.
   - **code/start9_programming_interface/**: Arduino code for the programming interface.
@@ -70,10 +71,11 @@ The MK1 CPU is composed of several modules, all connected trough a common 8-bit 
 
 ## Changelog
 
-##### V2.0c:
+##### V2.0d:
 
 - minor hardware revision
-- new memory architecture, code memory section is read-only
+- revisited PCB design
+- new memory architecture, code memory section is read-only, stack and data live on separated spaces
 
 ##### V2.0b:
 
