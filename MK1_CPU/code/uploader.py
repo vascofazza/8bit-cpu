@@ -28,6 +28,9 @@ if __name__ == '__main__':
     if not args.port and len(arduino_ports) > 1:
         warnings.warn('Multiple Arduinos found - using the first')
 
+    if not args.input.endswith('.bin'):
+        warnings.warn('Input file may not be binary - continuing')
+
     ser = serial.Serial(args.port or arduino_ports[0], baud, serial.EIGHTBITS, serial.PARITY_NONE, serial.STOPBITS_ONE)
     sleep(3)
 

@@ -18,8 +18,8 @@ void setup() {
   pinMode(RST, INPUT);
   pinMode(CU_EN, OUTPUT);
 
-  DDRD &= ~B11111100;
-  DDRB &= ~B00000011;
+  DDRD |= B11111100;
+  DDRB |= B00000011;
 }
 
 void reset()
@@ -73,8 +73,9 @@ void disableOutput()
   digitalWrite(EN, LOW);
 }
 
-void setAddress(byte address)
+void setAddress(unsigned int address)
 {
+  digitalWrite(HL, address > 0xFF);
   putOut(address);
   delay(1);
   enableOutput();
@@ -92,22 +93,15 @@ void putOut(byte data)
   delay(1);
 }
 
-void writeInstruction(byte instr, byte data)
+void writeInstruction(byte instr)
 {
-  digitalWrite(HL, LOW);
   putOut(instr);
   enableOutput();
+  delay(1);
   digitalWrite(RI, HIGH);
   delay(1);
   digitalWrite(RI, LOW);
   delay(1);
-  digitalWrite(HL, HIGH);
-  putOut(data);
-  digitalWrite(RI, HIGH);
-  delay(1);
-  digitalWrite(RI, LOW);
-  delay(1);
-  digitalWrite(HL, LOW);
   disableOutput();
   
 }
@@ -122,21 +116,20 @@ void loop() {
 
     reset();
     disable_cu();
-    for (int i = 0; i < 5; i++)
-      clock();
 
     delay(1);
     enableClock();
     delay(1);
-    for (int i = 0; i < p_size; i += 2)
+    for (int i = 0; i < p_size; i ++)
     {
-      setAddress(i / 2);
+      setAddress(i);
       delay(1);
-      writeInstruction(buffer[i], buffer[i + 1]);
+      writeInstruction(buffer[i]);
       delay(1);
     }
 
     disableClock();
+    digitalWrite(HL, LOW);
     reset();
     enable_cu();
   }

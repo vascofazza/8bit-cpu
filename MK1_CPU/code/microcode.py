@@ -4,7 +4,7 @@ from io import BytesIO
 import sys
 from functools import reduce
 
-_VERSION = 2.0
+_VERSION = "2.0d"
 
 HLT = 0b10000000000000000000000000000000  # Halt clock
 STK = 0b01000000000000000000000000000000  # Memory Stack address space
@@ -29,7 +29,7 @@ PO  = 0b00000000000101000000000000000000  # Program Counter out
 SO  = 0b00000000000011000000000000000000  # StackPointer register out
 EO  = 0b00000000000111000000000000000000  # ALU register out
 RO  = 0b00000000000000100000000000000000  # RAM data out
-IO  = 0b00000000000000010000000000000000  # Instruction register out
+_IO = 0b00000000000000010000000000000000  # Instruction register out
 SUB = 0b00000000000000001000000000000000  # ALU subtract mode
 OR  = 0b00000000000000000100000000000000  # ALU OR mode
 AND = 0b00000000000000001100000000000000  # ALU AND mode
@@ -47,7 +47,7 @@ E1  = 0b00000000000000000000000001000000  # X-Enable 1
 HL  = 0b00000000000000000000000000100000  # HL address mode
 RST = 0b00000000000000000000000000000001  # Reset step counter
 
-signals = {HLT : "HLT", STK: "STK", PE: "PE" , AI: "AI", BI: "BI", CI: "CI", DI: "DI", SI: "SI", EI: "EI", PI: "PI", MI: "MI", RI: "RI", II: "II", OI: "OI", XI: "XI", AO: "AO", BO: "BO", CO: "CO", DO: "DO", PO: "PO", SO: "SO", EO: "EO", RO: "RO", IO: "IO", SUB: "SUB", OR: "OR", AND: "AND", SHF: "SHF", ROT: "SHF", RGT: "RGT", NOT: "NOT", FI: "FI", SU: "SU", SD: "SD", U0: "U0", U1: "U1", E0: "E0", E1: "E1", HL: "HL", RST: "RST"}
+signals = {HLT : "HLT", STK: "STK", PE: "PE" , AI: "AI", BI: "BI", CI: "CI", DI: "DI", SI: "SI", EI: "EI", PI: "PI", MI: "MI", RI: "RI", II: "II", OI: "OI", XI: "XI", AO: "AO", BO: "BO", CO: "CO", DO: "DO", PO: "PO", SO: "SO", EO: "EO", RO: "RO", _IO: "IO", SUB: "SUB", OR: "OR", AND: "AND", SHF: "SHF", ROT: "SHF", RGT: "RGT", NOT: "NOT", FI: "FI", SU: "SU", SD: "SD", U0: "U0", U1: "U1", E0: "E0", E1: "E1", HL: "HL", RST: "RST"}
 
 register_map = {0: ('$a', AI, AO),
                 1: ('$b', BI, BO),
@@ -56,7 +56,7 @@ register_map = {0: ('$a', AI, AO),
                 4: ('$sp', SI, SO),
                 5: ('$pc', PI, PO),
                 6: ('$out', OI, 0),
-                7: ('imm', 0, IO)}
+                7: ('imm', 0, RO)}
 
 alu_op_map = {0: ('add', 0), 1: ('sub', SUB), 2: ('or', OR), 3: ('and', AND)}
 
@@ -76,7 +76,8 @@ ucode_template = dict()
 #jcf = move $spp imm
 #jzf = move $imm imm
 ucode_template.update({
-    (0b00 << 6) + (first << 3) + second : ('move %s, %s'%(register_map[first][0], register_map[second][0]), [MI|PO, RO|II|PE,  HL|RO|II,  register_map[first][2]|register_map[second][1], RST, RST, RST, RST], (second == 7 or first == 7))
+    (0b00 << 6) + (first << 3) + second : ('move %s, %s'%(register_map[first][0], register_map[second][0]), [MI|PO, RO|II|PE, register_map[first][2]|register_map[second][1], RST, RST, RST, RST, RST] if first != 7 else
+    [MI|PO, RO|II|PE, PO|MI, PE|register_map[first][2]|register_map[second][1], RST, RST, RST, RST], (second == 7 or first == 7))
     for first in range(8) for second in range(8)})
 
 #LOAD
@@ -97,8 +98,16 @@ ucode_template.update({
 
 #6: ('$spp', SO|SD, SO|SU)
 ucode_template.update({
-    (0b01 << 6) + (first << 3) + second : ('load %s, [%s]'%(register_map[first][0], register_map[second][0]), [MI|PO, RO|II|PE,  HL|RO|II,  SU,register_map[second][2]|MI, STK|register_map[first][1]|RO, RST, RST] if second == 4 else [MI|PO, RO|II|PE,  HL|RO|II,  register_map[second][2]|MI, register_map[first][1]|RO, RST, RST, RST], (second == 7 or first == 7))
-    for first in range(7) for second in range(8)})
+    (0b01 << 6) + (first << 3) + second : ('load %s, [%s]'%(register_map[first][0], register_map[second][0]),
+    [MI|PO, RO|II|PE, SU,register_map[second][2]|MI, STK|register_map[first][1]|RO, (PE if first == 5 else RST), RST, RST] if second == 4 else
+    [MI|PO, RO|II|PE, register_map[second][2]|MI, HL|register_map[first][1]|RO, RST, RST, RST, RST], (second == 7 or first == 7))
+    for first in range(7) for second in range(7)})
+
+ucode_template.update({
+    (0b01 << 6) + (first << 3) + second : ('load %s, [%s]'%(register_map[first][0], register_map[second][0]),
+    [MI|PO, RO|II|PE, PO|MI|SU,PE|register_map[second][2]|MI, STK|register_map[first][1]|RO, (PE if first == 5 else RST), RST, RST] if second == 4 else
+    [MI|PO, RO|II|PE, PO|MI, PE|register_map[second][2]|MI, HL|register_map[first][1]|RO, RST, RST, RST], (second == 7 or first == 7))
+    for first in range(7) for second in range(7,8)})
 
 #STORE
 #store $a imm
@@ -111,64 +120,62 @@ ucode_template.update({
 
 #6: ('$spp', SO|SD, SO|SU)
 ucode_template.update({
-    (0b10 << 6) + (first << 3) + second : ('stor %s, [%s]'%(register_map[first][0], register_map[second][0]), [MI|PO, RO|II|PE,  HL|RO|II,  register_map[second][2]|MI, (STK|SD if second == 4 else 0)|register_map[first][2]|RI, RST, RST, RST], (second == 7 or first == 7))
-    for first in range(6) for second in range(8)})
+    (0b10 << 6) + (first << 3) + second : ('stor %s, [%s]'%(register_map[first][0], register_map[second][0]), [MI|PO, RO|II|PE, register_map[second][2]|MI, (STK|SD if second == 4 else HL)|register_map[first][2]|RI, RST, RST, RST, RST], (second == 7 or first == 7))
+    for first in range(6) for second in range(7)})
 
 ucode_template.update({
-    (0b1011 << 4) + (op << 2) + second : ('%s imm, %s'%(alu_op_map[op][0], register_map[second][0]), [MI|PO, RO|II|PE,  HL|RO|II,  IO|EI, register_map[second][1]|EO|FI|alu_op_map[op][1], RST, RST, RST], True)
+    (0b10 << 6) + (first << 3) + second : ('stor %s, [%s]'%(register_map[first][0], register_map[second][0]), [MI|PO, RO|II|PE, PO|MI, PE|register_map[second][2]|MI, (STK|SD if second == 4 else HL)|register_map[first][2]|RI, RST, RST, RST], (second == 7 or first == 7))
+    for first in range(6) for second in range(7,8)})
+
+ucode_template.update({
+    (0b1011 << 4) + (op << 2) + second : ('%s imm, %s'%(alu_op_map[op][0], register_map[second][0]), [MI|PO, RO|II|PE,  PO|MI,  PE|RO|EI, register_map[second][1]|EO|FI|alu_op_map[op][1], RST, RST, RST], True)
     for second in range(4) for op in range(4)})
 
-ucode_template[0b01111111] = ('hlt', [MI|PO, RO|II|PE,  HL|RO|II,  HLT, RST, RST, RST, RST], False)
+ucode_template[0b01111111] = ('hlt', [MI|PO, RO|II|PE,  HLT, RST, RST, RST, RST, RST], False)
 #ALU
 #op $a $b
 #11 - op - rs - rd
 ucode_template.update({
-    (0b11 << 6) + (op << 4) + (first << 2) + second : ('%s %s, %s'%(alu_op_map[op][0], register_map[first][0], register_map[second][0]), [MI|PO, RO|II|PE,  HL|RO|II,  register_map[first][2]|EI, register_map[second][1]|EO|FI|alu_op_map[op][1], RST, RST, RST], False)
+    (0b11 << 6) + (op << 4) + (first << 2) + second : ('%s %s, %s'%(alu_op_map[op][0], register_map[first][0], register_map[second][0]), [MI|PO, RO|II|PE, register_map[first][2]|EI, register_map[second][1]|EO|FI|alu_op_map[op][1], RST, RST, RST, RST], False)
     for first in range(4) for second in range(4) for op in range(4)})
 
-ucode_template[0b01111000] = ('exr 0', [MI|PO, RO|II|PE,  HL|RO|II,  RST, RST, RST, RST, RST], False)
-ucode_template[0b01111001] = ('exr 1', [MI|PO, RO|II|PE,  HL|RO|II,  RST, RST, RST, RST, RST], False)
+ucode_template[0b01111000] = ('exr 0', [MI|PO, RO|II|PE, XI|E0|AI, RST, RST, RST, RST, RST], False)
+ucode_template[0b01111001] = ('exr 1', [MI|PO, RO|II|PE, XI|E1|AI,  RST, RST, RST, RST, RST], False)
 
-ucode_template[0b01111010] = ('not', [MI|PO, RO|II|PE,  HL|RO|II,  AO|EI, IO|AI, NOT|EO|AI, RST, RST], False)
-ucode_template[0b01111011] = ('sll', [MI|PO, RO|II|PE,  HL|RO|II,  SHF|AI, RST,     RST, RST, RST], False)
-ucode_template[0b01111100] = ('slr', [MI|PO, RO|II|PE,  HL|RO|II,  SHF|RGT|AI, RST, RST, RST, RST], False)
-ucode_template[0b01111101] = ('rll', [MI|PO, RO|II|PE,  HL|RO|II,  ROT|AI, RST,     RST, RST, RST], False)
-ucode_template[0b01111110] = ('rlr', [MI|PO, RO|II|PE,  HL|RO|II,  ROT|RGT|AI, RST, RST, RST, RST], False)
+ucode_template[0b01111010] = ('not', [MI|PO, RO|II|PE,  AO|EI, AI, NOT|EO|AI, RST, RST, RST], False)
+ucode_template[0b01111011] = ('sll', [MI|PO, RO|II|PE,  SHF|AI, RST,     RST, RST, RST, RST], False)
+ucode_template[0b01111100] = ('slr', [MI|PO, RO|II|PE,  SHF|RGT|AI, RST, RST, RST, RST, RST], False)
+ucode_template[0b01111101] = ('rll', [MI|PO, RO|II|PE,  ROT|AI, RST,     RST, RST, RST, RST], False)
+ucode_template[0b01111110] = ('rlr', [MI|PO, RO|II|PE,  ROT|RGT|AI, RST, RST, RST, RST, RST], False)
 
-ucode_template[0b00000111] = ('exw 0 0', [MI|PO, RO|II|PE,  HL|RO|II,  AO|E0, RST, RST, RST, RST], False)
-ucode_template[0b00001111] = ('exw 0 1', [MI|PO, RO|II|PE,  HL|RO|II,  AO|E0|U0, RST, RST, RST, RST], False)
-ucode_template[0b10001110] = ('exw 0 2', [MI|PO, RO|II|PE,  HL|RO|II,  AO|E0|U1, RST, RST, RST, RST], False)
-ucode_template[0b10010110] = ('exw 0 3', [MI|PO, RO|II|PE,  HL|RO|II,  AO|E0|U1|U0, RST, RST, RST, RST], False)
-ucode_template[0b00010111] = ('exw 1 0', [MI|PO, RO|II|PE,  HL|RO|II,  AO|E1, RST, RST, RST, RST], False)
-ucode_template[0b00011111] = ('exw 1 1', [MI|PO, RO|II|PE,  HL|RO|II,  AO|E1|U0, RST, RST, RST, RST], False)
-ucode_template[0b10011110] = ('exw 1 2', [MI|PO, RO|II|PE,  HL|RO|II,  AO|E1|U1, RST, RST, RST, RST], False)
-ucode_template[0b10100110] = ('exw 1 3', [MI|PO, RO|II|PE,  HL|RO|II,  AO|E1|U1|U0, RST, RST, RST, RST], False)
+ucode_template[0b00000111] = ('exw 0 0', [MI|PO, RO|II|PE, AO|E0, RST, RST, RST, RST, RST], False)
+ucode_template[0b00001111] = ('exw 0 1', [MI|PO, RO|II|PE, AO|E0|U0, RST, RST, RST, RST, RST], False)
+ucode_template[0b10001110] = ('exw 0 2', [MI|PO, RO|II|PE, AO|E0|U1, RST, RST, RST, RST, RST], False)
+ucode_template[0b10010110] = ('exw 0 3', [MI|PO, RO|II|PE, AO|E0|U1|U0, RST, RST, RST, RST, RST], False)
+ucode_template[0b00010111] = ('exw 1 0', [MI|PO, RO|II|PE, AO|E1, RST, RST, RST, RST, RST], False)
+ucode_template[0b00011111] = ('exw 1 1', [MI|PO, RO|II|PE, AO|E1|U0, RST, RST, RST, RST, RST], False)
+ucode_template[0b10011110] = ('exw 1 2', [MI|PO, RO|II|PE, AO|E1|U1, RST, RST, RST, RST, RST], False)
+ucode_template[0b10100110] = ('exw 1 3', [MI|PO, RO|II|PE, AO|E1|U1|U0, RST, RST, RST, RST, RST], False)
 
-ucode_template[0b10101110] = ('cmp $b', [MI|PO, RO|II|PE,  HL|RO|II,  BO|EI, SUB|FI, RST, RST, RST], False)
-ucode_template[0b10110110] = ('cmp $c', [MI|PO, RO|II|PE,  HL|RO|II,  CO|EI, SUB|FI, RST, RST, RST], False)
-ucode_template[0b10111110] = ('cmp $d', [MI|PO, RO|II|PE,  HL|RO|II,  DO|EI, SUB|FI, RST, RST, RST], False)
-ucode_template[0b10000110] = ('cmp imm', [MI|PO, RO|II|PE,  HL|RO|II, IO|EI, SUB|FI, RST, RST, RST], False)
+ucode_template[0b10101110] = ('cmp $b', [MI|PO, RO|II|PE, BO|EI, SUB|FI, RST, RST, RST, RST], False)
+ucode_template[0b01000110] = ('cmp $c', [MI|PO, RO|II|PE, CO|EI, SUB|FI, RST, RST, RST, RST], False)
+ucode_template[0b01001110] = ('cmp $d', [MI|PO, RO|II|PE, DO|EI, SUB|FI, RST, RST, RST, RST], False)
+ucode_template[0b10000110] = ('cmp imm', [MI|PO, RO|II|PE,  PO|MI, PE|RO|EI, SUB|FI, RST, RST, RST], False)
 
-ucode_template[0b00100111] = ('je0', [MI|PO, RO|II|PE,  HL|RO|II,  RST, RST, RST, RST, RST], False)
-ucode_template[0b00101111] = ('je1', [MI|PO, RO|II|PE,  HL|RO|II,  RST, RST, RST, RST, RST], False)
-ucode_template[0b00110111] = ('jcf', [MI|PO, RO|II|PE,  HL|RO|II,  RST, RST, RST, RST, RST], False)
-ucode_template[0b00111111] = ('jzf', [MI|PO, RO|II|PE,  HL|RO|II,  RST, RST, RST, RST, RST], False)
+ucode_template[0b00100111] = ('je0', [MI|PO, RO|II|PE, PE, RST, RST, RST, RST, RST], False)
+ucode_template[0b00101111] = ('je1', [MI|PO, RO|II|PE, PE, RST, RST, RST, RST, RST], False)
+ucode_template[0b00110111] = ('jcf', [MI|PO, RO|II|PE, PE, RST, RST, RST, RST, RST], False)
+ucode_template[0b00111111] = ('jzf', [MI|PO, RO|II|PE, PE, RST, RST, RST, RST, RST], False)
 
 def checkUCode():
     for op, code in ucode_template.items():
         if len(code) < 3 or len(code[1]) != 8:
-            print("Error: "+ str(op))
-            break
+            print("Error:", str(op), len(code), len(code[1]))
 
 instruction_decode = {y[0]:x for x,y in ucode_template.items()}
 
-ucode_template[instruction_decode['stor $pc, [$sp]']][1][5] = IO|register_map[5][1]
-
-#optmize fetch cycle
-for ucode in ucode_template.values():
-    if 'j' not in ucode[0] and all([IO & x == 0 for x in ucode[1]]):
-        ucode[1].pop(2)
-        ucode[1].append(RST)
+#TODO
+ucode_template[instruction_decode['stor $pc, [$sp]']][1][4:6] = [PO|MI, RO|register_map[5][1]]
 
 ucode = list(range(16)) #flag instruction step
 def initUCode():
@@ -202,80 +209,80 @@ def initUCode():
 
     #ZF = 0, CF = 0, IRQ0 = 0, IRQ1 = 1
     ucode[FLAGS_IRQ00IRQ11Z0C0] =  deepcopy(ucode_template)
-    ucode[FLAGS_IRQ00IRQ11Z0C0][J1][1][3] = IO|PI;
+    ucode[FLAGS_IRQ00IRQ11Z0C0][J1][1][2:4] = [PO|MI, RO|PI];
 
     #ZF = 0, CF = 0, IRQ0 = 1, IRQ1 = 0
     ucode[FLAGS_IRQ01IRQ10Z0C0] =  deepcopy(ucode_template)
-    ucode[FLAGS_IRQ01IRQ10Z0C0][J0][1][3] = IO|PI;
+    ucode[FLAGS_IRQ01IRQ10Z0C0][J0][1][2:4] = [PO|MI, RO|PI];
 
     #ZF = 0, CF = 0, IRQ0 = 1, IRQ1 = 1
     ucode[FLAGS_IRQ01IRQ11Z0C0] =  deepcopy(ucode_template)
-    ucode[FLAGS_IRQ01IRQ11Z0C0][J0][1][3] = IO|PI;
-    ucode[FLAGS_IRQ01IRQ11Z0C0][J1][1][3] = IO|PI;
+    ucode[FLAGS_IRQ01IRQ11Z0C0][J0][1][2:4] = [PO|MI, RO|PI];
+    ucode[FLAGS_IRQ01IRQ11Z0C0][J1][1][2:4] = [PO|MI, RO|PI];
 
     #ZF = 0, CF = 1, IRQ0 = 0, IRQ1 = 0
     ucode[FLAGS_IRQ00IRQ10Z0C1] =  deepcopy(ucode_template)
-    ucode[FLAGS_IRQ00IRQ10Z0C1][JC][1][3] = IO|PI;
+    ucode[FLAGS_IRQ00IRQ10Z0C1][JC][1][2:4] = [PO|MI, RO|PI];
 
     #ZF = 0, CF = 1, IRQ0 = 0, IRQ1 = 1
     ucode[FLAGS_IRQ00IRQ11Z0C1] =  deepcopy(ucode_template)
-    ucode[FLAGS_IRQ00IRQ11Z0C1][JC][1][3] = IO|PI;
-    ucode[FLAGS_IRQ00IRQ11Z0C1][J1][1][3] = IO|PI;
+    ucode[FLAGS_IRQ00IRQ11Z0C1][JC][1][2:4] = [PO|MI, RO|PI];
+    ucode[FLAGS_IRQ00IRQ11Z0C1][J1][1][2:4] = [PO|MI, RO|PI];
 
     #ZF = 0, CF = 1, IRQ0 = 1, IRQ1 = 0
     ucode[FLAGS_IRQ01IRQ10Z0C1] =  deepcopy(ucode_template)
-    ucode[FLAGS_IRQ01IRQ10Z0C1][JC][1][3] = IO|PI;
-    ucode[FLAGS_IRQ01IRQ10Z0C1][J0][1][3] = IO|PI;
+    ucode[FLAGS_IRQ01IRQ10Z0C1][JC][1][2:4] = [PO|MI, RO|PI];
+    ucode[FLAGS_IRQ01IRQ10Z0C1][J0][1][2:4] = [PO|MI, RO|PI];
 
     #ZF = 0, CF = 1, IRQ0 = 1, IRQ1 = 1
     ucode[FLAGS_IRQ01IRQ11Z0C1] =  deepcopy(ucode_template)
-    ucode[FLAGS_IRQ01IRQ11Z0C1][JC][1][3] = IO|PI;
-    ucode[FLAGS_IRQ01IRQ11Z0C1][J0][1][3] = IO|PI;
-    ucode[FLAGS_IRQ01IRQ11Z0C1][J1][1][3] = IO|PI;
+    ucode[FLAGS_IRQ01IRQ11Z0C1][JC][1][2:4] = [PO|MI, RO|PI];
+    ucode[FLAGS_IRQ01IRQ11Z0C1][J0][1][2:4] = [PO|MI, RO|PI];
+    ucode[FLAGS_IRQ01IRQ11Z0C1][J1][1][2:4] = [PO|MI, RO|PI];
 
     #ZF = 1, CF = 0, IRQ0 = 0, IRQ1 = 0
     ucode[FLAGS_IRQ00IRQ10Z1C0] =  deepcopy(ucode_template)
-    ucode[FLAGS_IRQ00IRQ10Z1C0][JZ][1][3] = IO|PI;
+    ucode[FLAGS_IRQ00IRQ10Z1C0][JZ][1][2:4] = [PO|MI, RO|PI];
 
     #ZF = 1, CF = 0, IRQ0 = 0, IRQ1 = 1
     ucode[FLAGS_IRQ00IRQ11Z1C0] =  deepcopy(ucode_template)
-    ucode[FLAGS_IRQ00IRQ11Z1C0][JZ][1][3] = IO|PI;
-    ucode[FLAGS_IRQ00IRQ11Z1C0][J1][1][3] = IO|PI;
+    ucode[FLAGS_IRQ00IRQ11Z1C0][JZ][1][2:4] = [PO|MI, RO|PI];
+    ucode[FLAGS_IRQ00IRQ11Z1C0][J1][1][2:4] = [PO|MI, RO|PI];
 
     #ZF = 1, CF = 0, IRQ0 = 1, IRQ1 = 0
     ucode[FLAGS_IRQ01IRQ10Z1C0] =  deepcopy(ucode_template)
-    ucode[FLAGS_IRQ01IRQ10Z1C0][JZ][1][3] = IO|PI;
-    ucode[FLAGS_IRQ01IRQ10Z1C0][J0][1][3] = IO|PI;
+    ucode[FLAGS_IRQ01IRQ10Z1C0][JZ][1][2:4] = [PO|MI, RO|PI];
+    ucode[FLAGS_IRQ01IRQ10Z1C0][J0][1][2:4] = [PO|MI, RO|PI];
 
     #ZF = 1, CF = 0, IRQ0 = 1, IRQ1 = 1
     ucode[FLAGS_IRQ01IRQ11Z1C0] =  deepcopy(ucode_template)
-    ucode[FLAGS_IRQ01IRQ11Z1C0][JZ][1][3] = IO|PI;
-    ucode[FLAGS_IRQ01IRQ11Z1C0][J0][1][3] = IO|PI;
-    ucode[FLAGS_IRQ01IRQ11Z1C0][J1][1][3] = IO|PI;
+    ucode[FLAGS_IRQ01IRQ11Z1C0][JZ][1][2:4] = [PO|MI, RO|PI];
+    ucode[FLAGS_IRQ01IRQ11Z1C0][J0][1][2:4] = [PO|MI, RO|PI];
+    ucode[FLAGS_IRQ01IRQ11Z1C0][J1][1][2:4] = [PO|MI, RO|PI];
 
     #ZF = 1, CF = 1, IRQ0 = 0, IRQ1 = 0
     ucode[FLAGS_IRQ00IRQ10Z1C1] =  deepcopy(ucode_template)
-    ucode[FLAGS_IRQ00IRQ10Z1C1][JC][1][3] = IO|PI;
-    ucode[FLAGS_IRQ00IRQ10Z1C1][JZ][1][3] = IO|PI;
+    ucode[FLAGS_IRQ00IRQ10Z1C1][JC][1][2:4] = [PO|MI, RO|PI];
+    ucode[FLAGS_IRQ00IRQ10Z1C1][JZ][1][2:4] = [PO|MI, RO|PI];
 
     #ZF = 1, CF = 1, IRQ0 = 0, IRQ1 = 1
     ucode[FLAGS_IRQ00IRQ11Z1C1] =  deepcopy(ucode_template)
-    ucode[FLAGS_IRQ00IRQ11Z1C1][JC][1][3] = IO|PI;
-    ucode[FLAGS_IRQ00IRQ11Z1C1][JZ][1][3] = IO|PI;
-    ucode[FLAGS_IRQ00IRQ11Z1C1][J1][1][3] = IO|PI;
+    ucode[FLAGS_IRQ00IRQ11Z1C1][JC][1][2:4] = [PO|MI, RO|PI];
+    ucode[FLAGS_IRQ00IRQ11Z1C1][JZ][1][2:4] = [PO|MI, RO|PI];
+    ucode[FLAGS_IRQ00IRQ11Z1C1][J1][1][2:4] = [PO|MI, RO|PI];
 
     #ZF = 1, CF = 1, IRQ0 = 1, IRQ1 = 0
     ucode[FLAGS_IRQ01IRQ10Z1C1] =  deepcopy(ucode_template)
-    ucode[FLAGS_IRQ01IRQ10Z1C1][JC][1][3] = IO|PI;
-    ucode[FLAGS_IRQ01IRQ10Z1C1][JZ][1][3] = IO|PI;
-    ucode[FLAGS_IRQ01IRQ10Z1C1][J0][1][3] = IO|PI;
+    ucode[FLAGS_IRQ01IRQ10Z1C1][JC][1][2:4] = [PO|MI, RO|PI];
+    ucode[FLAGS_IRQ01IRQ10Z1C1][JZ][1][2:4] = [PO|MI, RO|PI];
+    ucode[FLAGS_IRQ01IRQ10Z1C1][J0][1][2:4] = [PO|MI, RO|PI];
 
     #ZF = 1, CF = 1, IRQ0 = 1, IRQ1 = 1
     ucode[FLAGS_IRQ01IRQ11Z1C1] =  deepcopy(ucode_template)
-    ucode[FLAGS_IRQ01IRQ11Z1C1][JC][1][3] = IO|PI;
-    ucode[FLAGS_IRQ01IRQ11Z1C1][JZ][1][3] = IO|PI;
-    ucode[FLAGS_IRQ01IRQ11Z1C1][J0][1][3] = IO|PI;
-    ucode[FLAGS_IRQ01IRQ11Z1C1][J1][1][3] = IO|PI;
+    ucode[FLAGS_IRQ01IRQ11Z1C1][JC][1][2:4] = [PO|MI, RO|PI];
+    ucode[FLAGS_IRQ01IRQ11Z1C1][JZ][1][2:4] = [PO|MI, RO|PI];
+    ucode[FLAGS_IRQ01IRQ11Z1C1][J0][1][2:4] = [PO|MI, RO|PI];
+    ucode[FLAGS_IRQ01IRQ11Z1C1][J1][1][2:4] = [PO|MI, RO|PI];
 
 
 checkUCode()
