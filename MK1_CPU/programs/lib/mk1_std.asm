@@ -1,7 +1,6 @@
 ;-- utility functions --
 
 ;--- multiplication ---
-
 multiply: ; $a * $b
   mov $b $c
   mov $a $b
@@ -23,8 +22,10 @@ multiply: ; $a * $b
 
 ;--- divide ---
 divide: ;$a / $b
+#bank ".data"
 ._sign:
-  #res 2
+  #res 1
+#bank ".instr"
 
   mov $a $c; c contains tmp value
   ldi $d 2; sign on
