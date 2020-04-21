@@ -1,16 +1,21 @@
-#include "mk1.cpu"
+#include "lib/mk1.cpu"
 
-SPACE = 32
 ldi $a 0
 
 loop:
-  exw 0 1
+  jal print_int
   addi 1 $b
   ldi $a SPACE
-  exw 0 2
+  push $a
+  push $b
+  jal print_char
+  pop $b
+  pop $a
   jc end
   mov $b $a
   j loop
 
 end:
   hlt
+
+#include "lib/helix.asm"

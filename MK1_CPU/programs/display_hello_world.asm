@@ -1,19 +1,25 @@
-#include "mk1.cpu"
+#include "lib/mk1.cpu"
 
-j main
-#align 2
-helloworld: #str "H\0e\0l\0l\0o\0,\0 \0w\0o\0r\0l\0d\0!\0\0\0"
+#bank ".data"
+helloworld: #str "Hello, world!\0"
 
+#bank ".instr"
 main:
-  ldi $b helloworld / 2
-loop:
+  ldi $b helloworld
+.loop:
   ld $a [$b]
-  subi 0 $a
+  cmp 0
   jz end
-  exw 0 2
+  push $a
+  push $b
+  jal print_char
+  pop $b
+  pop $a
   ldi $a 1
   add $b $b
-  j loop
+  j .loop
 
 end:
   hlt
+
+#include "lib/helix.asm"
