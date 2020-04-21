@@ -2,13 +2,13 @@
 
 ;--- multiplication ---
 multiply: ; $a * $b
-  mov $b $c
-  mov $a $b
-  mov $a $d
+  mov $b $c ;counter
+  mov $a $b ;multiplication base
+  mov $a $d ;tmp
 
 .loop:
-  mov $c $a
-  subi 1 $a
+  mov $c $a ; counter equals 1 -> we're done
+  cmp 1
   jz .end
   mov $d $a
   add $b $d
@@ -21,17 +21,15 @@ multiply: ; $a * $b
   ret
 
 ;--- divide ---
-divide: ;$a / $b
 #bank ".data"
-._sign:
-  #res 1
+_sign: #res 1
 #bank ".instr"
-
+divide: ;$a / $b
   mov $a $c; c contains tmp value
   ldi $d 2; sign on
-  st $d ._sign
+  st $d _sign
   ldi $d 0; counter
-  subi 0 $a
+  cmp 0
   jz .ret
 
 .loop:
@@ -45,7 +43,7 @@ divide: ;$a / $b
   jz .set_sign
   ;sign is not positive, check against old sign
   push $d
-  ld $d ._sign
+  ld $d _sign
   sub $d $a
   pop $d
   jz .ret ;sign went negative, returning
@@ -63,7 +61,7 @@ divide: ;$a / $b
 
 .set_sign:
   ldi $a 128 ;set sign to 1, when we compare and it changes we're done.
-  st $a ._sign
+  st $a _sign
   j .continue
 
 
@@ -71,7 +69,7 @@ divide: ;$a / $b
 reminder: ;$a % $b
   mov $a $c; c contains tmp value
   ldi $d 2; sign
-  subi 0 $a
+  cmp 0
   jz .ret_zero
 
 .loop:
@@ -97,3 +95,16 @@ reminder: ;$a % $b
 .set_sign:
   ldi $d 128 ;set sign to 1, when we compare and it changes we're done.
   j .loop
+
+;--- compare ---
+compare: ;$a < $b
+  sub $b $a
+  add $b $a
+  jc .ret_false
+  ; a greater
+  ldi $a 0
+  ret
+  ; b greater
+.ret_false:
+  ldi $a 1
+  ret

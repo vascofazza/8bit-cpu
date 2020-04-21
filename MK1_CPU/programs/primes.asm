@@ -1,22 +1,33 @@
 ;--- computes prime numbers ---
-#include "mk1.cpu"
+;--- includes helix display support ---
+#include "lib/mk1.cpu"
 
 init:
   ldi $a 3
+  jal clear_display
 
 .loop:
   push $a
   jal is_prime ;call subroutine
-  subi 0 $a
+  cmp 0
   pop $a
   jz .continue ;if the result is 0 do not print value
-  out $a
+  push $a
+  jal print
+  pop $a
 .continue:
   addi 2 $a
   jc .end
   j .loop
 .end:
   hlt
+
+print:
+  out $a
+  ;jal print_int
+  ;ldi $a SPACE
+  ;jal print_char
+  ret
 
 ; --- is_prime ---
 is_prime:
@@ -32,7 +43,7 @@ is_prime:
   push $a
   push $b
   jal reminder
-  subi 0 $a
+  cmp 0
   jz .ret_false
   pop $a ; counter
   pop $b ; argument
@@ -53,4 +64,5 @@ is_prime:
   ldi $a 0
   ret
 
-#include "mk1_std.asm"
+#include "lib/mk1_std.asm"
+#include "lib/helix.asm"

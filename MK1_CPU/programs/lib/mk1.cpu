@@ -62,8 +62,8 @@
     slr	->	0b01111100
 
     cmp $b -> 0b10101110
-    cmp $c -> 0b10110110
-    cmp $d -> 0b10111110
+    cmp $c -> 0b01000110
+    cmp $d -> 0b01001110
     cmp {value: i8} -> { assert(value <= 0xff), 0b10000110 @ value }
 
     push {data: reg} -> 0b10 @ data[2:0] @ 0b100

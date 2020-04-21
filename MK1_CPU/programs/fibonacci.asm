@@ -1,5 +1,5 @@
 ;fibonacci sequence
-#include "mk1.cpu"
+#include "lib/mk1.cpu"
 
 init:
   ldi $a 1

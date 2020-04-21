@@ -1,302 +1,235 @@
 ;--- test suite ---
-#include "mk1.cpu"
+#include "lib/mk1.cpu"
 
+init:
 ;--- MOVE ---
 
-test_01:
-  ldi $a 0xFF
+test_00: ;cmp
+  ldi $a 243
+  cmp 200
+  jz end
   mov $a $b
-  mov $b $c
-  mov $c $d
-  sub $b $a
-  jz .continue1
+  cmp $b
+  jz test_01
   hlt
-.continue1:
-  mov $c $a
-  sub $c $a
-  jz .continue2
-  hlt
-.continue2:
-  mov $d $a
-  sub $d $a
-  jz .test_ok
-  hlt
-.test_ok:
-  ldi $a 1
-  out
 
-test_02:
+test_01:
   ldi $a 0x77
-  subi 0x77 $a
+  cmp 0x77
   jz .continue1
   hlt
 .continue1:
   ldi $b 0x66
   ldi $a 0x66
-  sub $b $a
+  cmp $b
+  jz .test_ok
+  hlt
+.test_ok:
+  out 1
+
+test_02:
+  ldi $a 0xFF
+  mov $a $b
+  mov $b $c
+  mov $c $d
+  cmp $b
+  jz .continue1
+  hlt
+.continue1:
+  mov $c $a
+  cmp $c
   jz .continue2
   hlt
 .continue2:
-  ldi $c 0x55
-  ldi $a 0x55
-  sub $c $a
-  jz .continue3
-  hlt
-.continue3:
-  ldi $d 0x44
-  ldi $a 0x44
-  sub $d $a
+  mov $d $a
+  cmp $d
   jz .test_ok
   hlt
 .test_ok:
-  ldi $a 2
-  out
+  out 2
 
 ;--- LOAD ---
-
-j test_03
+#bank ".data"
 variable: #d8 0x55
-location =  pc
-variable_location: #d8 location / 2
+variable_location: #d8 variable
+#bank ".instr"
 test_03:
-  ld $a location
-  subi 0x55 $a
+  ld $a variable
+  cmp 0x55
   jz .test_ok
   hlt
 .test_ok:
-  ldi $a 3
-  out
+  out 3
 
 test_04:
   ld $b variable_location
   ld $a [$b]
-  subi 0x55 $a
+  cmp 0x55
   jz .test_ok
   hlt
 .test_ok:
-  ldi $a 4
-  out
+  out 4
 
 ;--- STORE ---
 
-j test_05
+#bank ".data"
 value = 0x42
-store_variable: #res 2
-var_location = pc - 2
+store_variable: #res 1
+#bank ".instr"
 test_05:
   ldi $a value
-  st $a var_location
-  ld $b var_location
-  sub $b $a
+  st $a store_variable
+  ld $b store_variable
+  cmp $b
   jz .test_ok
   hlt
 .test_ok:
-  ldi $a 5
-  out
+  out 5
 
 test_06:
   value1 = 0x54
   ldi $a value1
-  ldi $b var_location / 2
+  ldi $b store_variable
   st $a [$b]
   ld $b [$b]
-  sub $b $a
+  cmp $b
   jz .test_ok
   hlt
 .test_ok:
-  ldi $a 6
-  out
+  out 6
 
 ;ALU
 
 test_07:
-  ldi $a 77
-  ldi $b 10
-  add $b $a
-  subi 87 $a
-  jz .test_ok
-  hlt
-.test_ok:
-  ldi $a 7
-  out
-
-test_08:
   ldi $a 77
   addi 10 $a
   subi 87 $a
   jz .test_ok
   hlt
 .test_ok:
-  ldi $a 8
-  out
+  out 7
 
-test_09:
+test_08:
   ldi $a 77
   ldi $b 10
   sub $b $a
-  subi 67 $a
+  cmp 67
   jz .test_ok
   hlt
 .test_ok:
-  ldi $a 9
-  out
+  out 8
+
+test_09:
+  ldi $a 77
+  ori 112 $a
+  cmp 125
+  jz .test_ok
+  hlt
+.test_ok:
+  out 9
 
 test_10:
   ldi $a 77
-  subi 10 $a
-  subi 67 $a
+  andi 112 $a
+  cmp 64
   jz .test_ok
   hlt
 .test_ok:
-  ldi $a 10
-  out
+  out 10
 
 test_11:
-  ldi $a 77
-  ldi $b 112
-  or $b $a
-  subi 125 $a
-  jz .test_ok
-  hlt
-.test_ok:
-  ldi $a 11
-  out
-
-test_12:
-  ldi $a 77
-  ori 112 $a
-  subi 125 $a
-  jz .test_ok
-  hlt
-.test_ok:
-  ldi $a 12
-  out
-
-test_13:
-  ldi $a 77
-  ldi $b 112
-  and $b $a
-  subi 64 $a
-  jz .test_ok
-  hlt
-.test_ok:
-  ldi $a 13
-  out
-
-test_14:
-  ldi $a 77
-  andi 112 $a
-  subi 64 $a
-  jz .test_ok
-  hlt
-.test_ok:
-  ldi $a 14
-  out
-
-test_15:
   ldi $a 0x55
   not
-  subi 0xAA $a
+  cmp 0xAA
   jz .test_ok
   hlt
 .test_ok:
-  ldi $a 15
-  out
+  out 11
 
-test_16:
+test_12:
   ldi $a 0xAA
   sll
-  subi 0x54 $a
+  cmp 0x54
   jz .test_ok
   hlt
 .test_ok:
-  ldi $a 16
-  out
+  out 12
 
-test_17:
+test_13:
   ldi $a 0x55
   slr
-  subi 0x2A $a
+  cmp 0x2A
   jz .test_ok
   hlt
 .test_ok:
-  ldi $a 17
-  out
+  out 13
 
-test_18:
+test_14:
   ldi $a 0xB2
   rll
-  subi 0x65 $a
+  cmp 0x65
   jz .test_ok
   hlt
 .test_ok:
-  ldi $a 18
-  out
+  out 14
 
-test_19:
+test_15:
   ldi $a 0x65
   rlr
-  subi 0xB2 $a
+  cmp 0xB2
   jz .test_ok
   hlt
 .test_ok:
-  ldi $a 19
-  out
+  out 15
 
 ;EXTRA (pop push jal ret jz jc)
 
-test_20:
+test_16:
   mov $sp $a
-  subi 0 $a
+  cmp 0
   jz .continue1
   hlt
 .continue1:
   ldi $a 123
   push $a
   mov $sp $a
-  subi 0xFF $a
+  cmp 0xFF
   jz .continue2
   hlt
 .continue2:
   pop $b
-  subi 0 $a
+  mov $sp $a
+  cmp 0
   jz .continue3
   hlt
 .continue3:
   mov $b $a
-  subi 123 $a
+  cmp 123
   jz .test_ok
   hlt
 .test_ok:
-  ldi $a 20
-  out
+  out 16
 
-test_21:
+test_17:
   ldi $a 0xFF
   addi 0 $a
-  jz .test_no
-  jc .test_no
+  jc end
   addi 1 $a
   jc .test_ok
   hlt
-.test_no:
-  hlt
 .test_ok:
-  ldi $a 21
-  out
+  out 17
 
-test_22:
+test_18:
   jal func
-  subi 0x55 $a
+  cmp 0x55
   jz .test_ok
   hlt
 .test_ok:
-  ldi $a 22
-  out
+  out 18
 
-test_23: ;cmp
-
-hlt
+end:
+  hlt
 
 func:
   ldi $a 0x55

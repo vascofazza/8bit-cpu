@@ -1,11 +1,11 @@
 ;fibonacci sequence - recursive algorithm
-#include "mk1.cpu"
+#include "lib/mk1.cpu"
 
 main:
   ldi $a 1 ; counter
 
 .loop:
-  subi 14 $b ; maximum printable fibonacci value is fib(13)
+  cmp 14 ; maximum printable fibonacci value is fib(13)
   jz .end
   push $a
   jal fibonacci ; computing fib(counter)
@@ -19,7 +19,7 @@ main:
 
 fibonacci:
   mov $a $d ; input argument to $d
-  subi 0 $a
+  cmp 0
   jz .ret_base_0 ; if argument is 0 ret 0
   subi 1 $a
   jz .ret_base_1 ; if argument is 1 ret 1

@@ -1,6 +1,6 @@
-#include "mk1.cpu"
+#include "lib/mk1.cpu"
 
 main:
-  addi $a 1
+  addi 1 $a
   out
   j main
