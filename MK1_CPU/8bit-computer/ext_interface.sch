@@ -158,7 +158,7 @@ F 3 "" H 5000 4750 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	5000 4550 5000 4750
+	5000 4550 5000 4700
 Connection ~ 3600 3750
 Connection ~ 3500 3650
 Wire Wire Line
@@ -436,7 +436,7 @@ Wire Wire Line
 	2700 3400 2700 3450
 Connection ~ 2700 3450
 Wire Wire Line
-	2700 3450 5000 3450
+	2700 3450 3150 3450
 $Comp
 L Connector:TestPoint TP?
 U 1 1 77FE10A9
@@ -682,4 +682,29 @@ Wire Wire Line
 	4800 1800 6050 1800
 Wire Wire Line
 	6050 1800 6050 2600
+$Comp
+L Device:C C?
+U 1 1 5EA144EC
+P 3150 4050
+AR Path="/5B57D8E5/5EA144EC" Ref="C?"  Part="1" 
+AR Path="/6017B840/5EA144EC" Ref="C45"  Part="1" 
+F 0 "C45" H 3175 4150 50  0000 L CNN
+F 1 "0.01µF" H 3175 3950 50  0000 L CNN
+F 2 "Capacitor_THT:C_Disc_D4.3mm_W1.9mm_P5.00mm" H 3188 3900 50  0001 C CNN
+F 3 "" H 3150 4050 50  0001 C CNN
+	1    3150 4050
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	3150 3900 3150 3450
+Connection ~ 3150 3450
+Wire Wire Line
+	3150 3450 5000 3450
+Wire Wire Line
+	3150 4200 3150 4700
+Wire Wire Line
+	3150 4700 5000 4700
+Connection ~ 5000 4700
+Wire Wire Line
+	5000 4700 5000 4750
 $EndSCHEMATC
