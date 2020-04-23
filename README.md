@@ -66,7 +66,7 @@ The MK1 CPU is composed of several modules, all connected trough a common 8-bit 
 - **helix_display_interface/**:
   - **display_interface/**: KiCad project, schematics and PCB design of the **Helix** display interface board.
   - **code/helix_display_interface/**: Arduino code for the display interface.
-- **eeprom_programmer/: ** KiCad project, schematics and PCB design of a simple Arduino-based eeprom programmer
+- **eeprom_programmer/**: KiCad project, schematics and PCB design of a simple Arduino-based eeprom programmer
 - **bus_breakout/**: KiCad project, schematics and PCB design of the external bus connector breakout board.
 
 ## Changelog
