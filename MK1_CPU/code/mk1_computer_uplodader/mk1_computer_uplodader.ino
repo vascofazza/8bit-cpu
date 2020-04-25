@@ -26,7 +26,7 @@ void reset()
 {
   pinMode(RST, OUTPUT);
   digitalWrite(RST, HIGH);
-  delay(10);
+  delayMicroseconds(10);
   digitalWrite(RST, LOW);
   pinMode(RST, INPUT);
 }
@@ -35,7 +35,7 @@ void clock()
 {
   pinMode(CLK, OUTPUT);
   digitalWrite(CLK, HIGH);
-  delay(1);
+  delayMicroseconds(1);
   digitalWrite(CLK, LOW);
   pinMode(CLK, INPUT);
 }
@@ -77,12 +77,12 @@ void setAddress(unsigned int address)
 {
   digitalWrite(HL, address > 0xFF);
   putOut(address);
-  delay(1);
+  delayMicroseconds(1);
   enableOutput();
   digitalWrite(MI, HIGH);
-  delay(1);
+  delayMicroseconds(1);
   digitalWrite(MI, LOW);
-  delay(1);
+  delayMicroseconds(1);
   disableOutput();
 }
 
@@ -90,18 +90,18 @@ void putOut(byte data)
 {
   PORTD = (PORTD & 0x3) | (data << 2);
   PORTB = (PORTB & 0xFC) | (data >> 6 & 0x3);
-  delay(1);
+  delayMicroseconds(1);
 }
 
 void writeInstruction(byte instr)
 {
   putOut(instr);
   enableOutput();
-  delay(1);
+  delayMicroseconds(1);
   digitalWrite(RI, HIGH);
-  delay(1);
+  delayMicroseconds(1);
   digitalWrite(RI, LOW);
-  delay(1);
+  delayMicroseconds(1);
   disableOutput();
   
 }
@@ -117,15 +117,15 @@ void loop() {
     reset();
     disable_cu();
 
-    delay(1);
+    delayMicroseconds(1);
     enableClock();
-    delay(1);
+    delayMicroseconds(1);
     for (int i = 0; i < p_size; i ++)
     {
       setAddress(i);
-      delay(1);
+      delayMicroseconds(1);
       writeInstruction(buffer[i]);
-      delay(1);
+      delayMicroseconds(1);
     }
 
     disableClock();

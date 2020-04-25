@@ -1,17 +1,19 @@
-#define MI 
+#define MI 8
 #define HL 9
-#define RI 12
-#define EN 13
-#define CLK A0
-#define RST A1
-#define CU_EN A2
+#define RI 10
+#define EN 11
+#define CLK 12
+#define RST 13
+#define CU_EN A5
 
 #define NEXT A4
 
+#define DELAY 2000
+
+byte current_bank = 0;
+
 void setup() {
   // put your setup code here, to run once:
-  Serial.begin(9600);
-  //Serial.setTimeout(5000);
   pinMode(MI, OUTPUT);
   pinMode(HL, OUTPUT);
   pinMode(RI, OUTPUT);
@@ -19,15 +21,17 @@ void setup() {
   pinMode(CLK, INPUT);
   pinMode(RST, INPUT);
   pinMode(CU_EN, OUTPUT);
+  pinMode(NEXT, INPUT_PULLUP);
 
   DDRD |= B11111111;
+  DDRC |= B00001111;
 }
 
 void reset()
 {
   pinMode(RST, OUTPUT);
   digitalWrite(RST, HIGH);
-  delay(10);
+  delayMicroseconds(10);
   digitalWrite(RST, LOW);
   pinMode(RST, INPUT);
 }
@@ -36,7 +40,7 @@ void clock()
 {
   pinMode(CLK, OUTPUT);
   digitalWrite(CLK, HIGH);
-  delay(1);
+  delayMicroseconds(1);
   digitalWrite(CLK, LOW);
   pinMode(CLK, INPUT);
 }
@@ -74,65 +78,94 @@ void disableOutput()
   digitalWrite(EN, LOW);
 }
 
-void setAddress(unsigned int address)
+void set_bank(byte bank)
+{
+  PORTC = bank + (PORTC & 0xF0);
+}
+
+void set_address(unsigned int address)
 {
   digitalWrite(HL, address > 0xFF);
-  putOut(address);
-  delay(1);
+  set_bank(0);
+  delayMicroseconds(1);
+  put_out(address % 256);
+  delayMicroseconds(1);
   enableOutput();
   digitalWrite(MI, HIGH);
-  delay(1);
+  delayMicroseconds(1);
   digitalWrite(MI, LOW);
-  delay(1);
+  delayMicroseconds(1);
   disableOutput();
+  set_bank(current_bank);
 }
 
-void putOut(byte data)
+void put_out(byte data)
 {
   PORTD = data;
-  delay(1);
 }
 
-void writeInstruction(byte instr)
+void write_instruction(byte instr)
 {
-  putOut(instr);
+  put_out(instr % 256);
   enableOutput();
-  delay(1);
+  delayMicroseconds(1);
   digitalWrite(RI, HIGH);
-  delay(1);
+  delayMicroseconds(1);
   digitalWrite(RI, LOW);
-  delay(1);
+  delayMicroseconds(1);
   disableOutput();
-  
+
 }
 
-byte buffer[512];
+void handle_button()
+{
+  while (true)
+  {
+    if (!digitalRead(NEXT))
+    {
+      if (++current_bank > 15)
+        current_bank = 1;
+      set_bank(current_bank);
+      delay(250);
+      auto curr_time = millis();
+      bool next = false;
+      while (millis() - curr_time < DELAY)
+      {
+        if (!digitalRead(NEXT))
+        {
+          next = true;
+          break;
+        }
+      }
+      if (next)
+        continue;
+      break;
+    }
+  }
+}
 
 void loop() {
-  if (Serial.available()) {
 
-    int p_size = Serial.readBytes(buffer, sizeof(buffer));
-    Serial.write(0);
+  handle_button();
 
-    reset();
-    disable_cu();
+  reset();
+  disable_cu();
 
-    delay(1);
-    enableClock();
-    delay(1);
-    for (int i = 0; i < p_size; i ++)
-    {
-      setAddress(i);
-      delay(1);
-      writeInstruction(buffer[i]);
-      delay(1);
-    }
-
-    disableClock();
-    digitalWrite(HL, LOW);
-    reset();
-    enable_cu();
+  delayMicroseconds(1);
+  enableClock();
+  delayMicroseconds(1);
+  for (int i = 0; i < 512; i ++)
+  {
+    set_address(i);
+    delayMicroseconds(1);
+    write_instruction(i);
+    delayMicroseconds(1);
   }
+
+  disableClock();
+  digitalWrite(HL, LOW);
+  reset();
+  enable_cu();
   disableOutput();
 
 }

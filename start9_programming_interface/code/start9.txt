@@ -1,0 +1,11 @@
+1	test_suite.bin
+2	display_counter.bin
+3	fibonacci.bin
+4	multiplication_tables.bin
+5	fibonacci_recursive.bin
+6	factorial.bin
+7	primes.bin
+8	display_hello_world.bin
+9	bubble_sort.bin
+10	merge_sort.bin
+11	quick_sort.bin
