@@ -2,6 +2,43 @@
 
 SPACE = 32
 
+#bank ".data"
+_ready: #d8 1
+#bank ".instr"
+
+init_display:
+  ldi $a 1
+  je0 .ret
+  ldi $a 0
+.ret:
+  st $a _ready
+  ret
+
+print_char:
+  jal _display_ready
+  exw 0 2
+  ret
+
+print_int:
+  jal _display_ready
+  exw 0 1
+  ret
+
+clear_display:
+  jal _display_ready
+  exw 0 3
+  ret
+
+_display_ready:
+  push $a
+  ld $a _ready
+  add $a $a
+  jz .ret
+  jal _active_wait
+.ret:
+  pop $a
+  ret
+
 _active_wait:
   nop
   je0 .ret
@@ -9,25 +46,4 @@ _active_wait:
   j _active_wait
 .ret:
   exr 0
-  ret
-
-print_char:
-  push $a
-  jal _active_wait
-  pop $a
-  exw 0 2
-  ret
-
-print_int:
-  push $a
-  jal _active_wait
-  pop $a
-  exw 0 1
-  ret
-
-clear_display:
-  push $a
-  jal _active_wait
-  pop $a
-  exw 0 3
   ret

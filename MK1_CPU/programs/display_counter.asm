@@ -1,18 +1,17 @@
 #include "lib/mk1.cpu"
 
+jal init_display
 ldi $a 0
 
 loop:
-  jal print_int
-  addi 1 $b
-  ldi $a SPACE
   push $a
-  push $b
+  out
+  jal print_int
+  ldi $a SPACE
   jal print_char
-  pop $b
   pop $a
+  addi 1 $a
   jc end
-  mov $b $a
   j loop
 
 end:

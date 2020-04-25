@@ -8,6 +8,7 @@ vector: #res vector_len
 #bank ".instr"
 
 init:
+  jal init_display
   ;copy vector to tmp array
   ldi $a 0
 .loop:
@@ -22,8 +23,7 @@ init:
 
 main:
   jal print
-  ldi $a vector_len
-  subi 1 $b ;prepare end - 1
+  ldi $b vector_len - 1
   ldi $a 0
   jal merge_sort
   jal print
@@ -31,7 +31,7 @@ main:
 
 merge_sort: ; start, end
   cmp $b ; if start == end -> return
-  jz .return
+  jz return
 
   ;compute mid index
   mov $a $d ; d = start
@@ -64,7 +64,8 @@ merge_sort: ; start, end
 
   ;merge phase
   jal merge
-.return:
+
+return:
   ret
 
 ; ---- merge function ----
@@ -87,7 +88,7 @@ index: #res 1
   addi 1 $a
   st $a start2 ; a = mid +1 = start2
 
-; if vec[mid] <= vec[start2] -> return
+  ;if vec[mid] <= vec[start2] -> return
   addi vector $a ; a = [start2]
   ld $c [$a] ; c = vec[start2]
   ldi $a vector
@@ -95,9 +96,8 @@ index: #res 1
   mov $c $a ; a = vec[start2]
   ld $b [$b] ; b = vec[mid]
   jal compare ; $a < $b? vec[start2] < vec[mid] ?
-  cmp 1
-  jz .while
-  j .return
+  add $a $a ;cmp 1 , invert condition
+  jz return
 
 .while:
   ;while start <= mid and start2 <= end
@@ -105,14 +105,14 @@ index: #res 1
   ld $b start
   jal compare ; mid < start?
   cmp 1
-  jz .return
+  jz return
   ld $a end
   ld $b start2
   push $b
   jal compare ; end < start2?
   cmp 1
   pop $a
-  jz .return
+  jz return
 
 .if: ;a -> start2
   ;if vec[start] <= vec[start2] -> start++
@@ -174,22 +174,18 @@ index: #res 1
   st $b mid ; mid++
   j .while
 
-.return:
-  ret
-
 #include "lib/helix.asm"
 
 ;--- compare ---
 compare: ;$a < $b
   sub $b $a
   add $b $a
+  ldi $a 1
   jc .ret_false
   ; a greater
   ldi $a 0
-  ret
   ; b greater
 .ret_false:
-  ldi $a 1
   ret
 
 ; print subroutine

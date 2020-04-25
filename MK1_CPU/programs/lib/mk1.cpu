@@ -38,6 +38,8 @@
     nop -> 0x00
     hlt -> 0b01111111
 
+    ldi {dst: reg} 0 -> 0b11 @ 0b01 @ 0b00 @ dst[1:0]
+
     mov {src: reg} {dst: reg} -> 0b00 @ src[2:0] @ dst[2:0]
     ldi {dst: reg} {value: i8} -> { assert(value <= 0xff), 0b00 @ 0b111 @ dst[2:0] @ value }
     out -> 0b00000110

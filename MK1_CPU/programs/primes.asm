@@ -3,8 +3,8 @@
 #include "lib/mk1.cpu"
 
 init:
+  jal init_display
   ldi $a 3
-  jal clear_display
 
 .loop:
   push $a
@@ -24,9 +24,9 @@ init:
 
 print:
   out $a
-  ;jal print_int
-  ;ldi $a SPACE
-  ;jal print_char
+  jal print_int
+  ldi $a SPACE
+  jal print_char
   ret
 
 ; --- is_prime ---

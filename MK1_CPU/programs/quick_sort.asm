@@ -8,6 +8,7 @@ vector: #res vector_len
 #bank ".instr"
 
 init:
+  jal init_display
   ;copy vector to tmp array
   ldi $a 0
 .loop:

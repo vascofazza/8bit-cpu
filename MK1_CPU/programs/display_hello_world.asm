@@ -5,6 +5,7 @@ helloworld: #str "Hello, world!\0"
 
 #bank ".instr"
 main:
+  jal init_display
   ldi $b helloworld
 .loop:
   ld $a [$b]

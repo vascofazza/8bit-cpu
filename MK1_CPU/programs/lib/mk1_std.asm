@@ -4,11 +4,13 @@
 multiply: ; $a * $b
   mov $b $c ;counter
   mov $a $b ;multiplication base
-  mov $a $d ;tmp
+  ldi $d 0 ;tmp
+  cmp 0
+  jz .end
 
 .loop:
-  mov $c $a ; counter equals 1 -> we're done
-  cmp 1
+  mov $c $a ; counter equals 0 -> we're done
+  cmp 0
   jz .end
   mov $d $a
   add $b $d

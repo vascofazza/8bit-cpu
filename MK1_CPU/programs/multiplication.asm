@@ -1,4 +1,4 @@
-; reminder test
+; multiplication test
 #include "lib/mk1.cpu"
 
 ldi $a 5
