@@ -24,7 +24,7 @@ This repository contains pictures, schematics, and code for this project and its
 
 **DEMO VIDEO (YouTube)**
 
-[![MK1 Computer - home-made Programmable 8bit CPU](https://img.youtube.com/vi/R_gflIunANo/0.jpg)](https://www.youtube.com/watch?v=R_gflIunANo)
+[![MK1 Computer - home-made Programmable 8bit CPU](https://img.youtube.com/vi/qSviFkpLFKI/0.jpg)](https://www.youtube.com/watch?v=qSviFkpLFKI)
 
 ## Architecture
 
