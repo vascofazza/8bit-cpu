@@ -3,8 +3,11 @@
 Schematics and code for my home-made 8-bit CPU and its companion boards.
 
 Articles about this project:
+
 [Hackaday.com](https://hackaday.com/2020/12/31/diy-8-bit-computer-knows-all-the-tricks/)
+
 [Hackster.io](https://www.hackster.io/news/see-inside-of-a-cpu-with-the-mk1-8bit-computer-14fa9e313c73)
+
 [InformaticaLab.com](https://blog.informaticalab.com/viaggio-allinterno-di-una-cpu-con-il-mk1-8bit-computer/)
 
 ## Overview
