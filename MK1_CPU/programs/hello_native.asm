@@ -4,7 +4,7 @@
 #bank ".data"
 helloworld: #str "Hello, world!\0"
 s2: #str "Knock knock?\0"
-s3: #str "Who's there?\0"
+s3: #str " Who's there?\0"
 
 #bank ".instr"
 
@@ -13,12 +13,8 @@ jal init_lcd
 ldi $b helloworld
 jal print_string
 
-jal clear_lcd
-
 ldi $b s2
-jal print_string
-
-jal clear_lcd
+jal print_string_ln
 
 ldi $b s3
 jal print_string
@@ -26,7 +22,7 @@ jal print_string
 hlt
 
 init_lcd:
-  ldi $a 0b00001101;  display on, cursor on, cursor blinks
+  ldi $a 0b00001101;  display on, cursor off, cursor blinks
   exw 0 1;   
   ldi $a 0b00000000;  rs = 0
   exw 0 2;   
@@ -57,15 +53,36 @@ clear_lcd:
   exw 0 1;   
   ldi $a 0b00000000;  rs = 0
   exw 0 2;
-  exw 0 3; 
+  exw 0 3;
+  
+  ret
   
 
 print_char:
   exw 0 1;   
-  ldi $a 0b00000001;  rs/rw
+  ldi $a 0b00000001;  rs = 1
   exw 0 2         
   exw 0 3  
   ret
+
+print_string_ln:
+
+jal clear_lcd
+
+.loop:
+  ld $a [$b]
+  cmp 0
+  jz .ret
+    push $a
+    push $b
+    jal print_char
+    pop $b
+    pop $a
+    ldi $a 1
+    add $b $b
+  j .loop
+  .ret:
+    ret
 
 print_string:
 
