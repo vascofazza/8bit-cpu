@@ -1,11 +1,11 @@
 ;--- merge sort ---
 #include "lib/mk1.cpu"
 
-#bank ".data"
+#bank data
 data: #d8 123, 210, 20, 13, 222, 94, 205, 199, 213, 176, 58, 160, 216, 12, 73, 172, 184, 225, 125, 63, 186, 111, 252, 136, 242, 92, 101, 134, 175, 126, 195, 2, 42, 57, 149, 23, 223, 48, 214, 217
 vector_len = pc - data
 vector: #res vector_len
-#bank ".instr"
+#bank instr
 
 init:
   jal init_display
@@ -72,13 +72,13 @@ return:
 merge: ;start, mid, end
 
 ; merge variables
-#bank ".data"
+#bank data
 start: #res 1
 start2: #res 1
 mid: #res 1
 end: #res 1
 index: #res 1
-#bank ".instr"
+#bank instr
 
   ;init variable
   st $a start

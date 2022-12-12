@@ -1,3 +1,3 @@
 [submodule "MK1_CPU/assembler"]
 	path = MK1_CPU/assembler
-	url = git@github.com:vascofazza/customasm.git
+	url = git@github.com:hlorenzi/customasm.git
