@@ -23,9 +23,9 @@ multiply: ; $a * $b
   ret
 
 ;--- divide ---
-#bank ".data"
+#bank data
 _sign: #res 1
-#bank ".instr"
+#bank instr
 divide: ;$a / $b
   mov $a $c; c contains tmp value
   ldi $d 2; sign on

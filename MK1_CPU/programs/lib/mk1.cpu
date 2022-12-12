@@ -1,96 +1,96 @@
-#bankdef ".instr"
+#bits 8
+
+#bankdef instr
 {
-  #addr 0x00
-  #size 0x100
-  #outp 0x00
+    #addr 0x00
+    #size 0x100
+    #outp 0x00
 }
 
-#bankdef ".data"
+#bankdef data
 {
-  #addr 0x00
-  #size 0x100
-  #outp 0x100
+    #addr 0x00
+    #size 0x100
+    #outp 8 * 0x100
 }
 
-#cpudef
+#subruledef reg
 {
-    #bits 8
-
-    #tokendef reg
-    {
-        $a   = 0
-        $b   = 1
-        $c   = 2
-        $d   = 3
-        $sp  = 4
-        $pc  = 5
-        $out = 6
-    }
-
-    #tokendef alu_op
-    {
-        add = 0
-        sub = 1
-        or  = 2
-        and = 3
-    }
-
-    nop -> 0x00
-    hlt -> 0b01111111
-
-    ldi {dst: reg} 0 -> 0b11 @ 0b01 @ 0b00 @ dst[1:0]
-
-    mov {src: reg} {dst: reg} -> 0b00 @ src[2:0] @ dst[2:0]
-    ldi {dst: reg} {value: i8} -> { assert(value <= 0xff), 0b00 @ 0b111 @ dst[2:0] @ value }
-    out -> 0b00000110
-    out	{value: reg} -> 0b00 @ value[2:0] @ 0b110
-    out {value: i8} -> { assert(value <= 0xff), 0b00 @ 0b111 @ 0b110 @ value }
-
-    j {address: u8} -> { assert(address <= 0xff), 0b00 @ 0b111 @ 3'5 @ address }
-
-    ld {dst: reg} [{addr: reg}] -> 0b01 @ dst[2:0] @ addr[2:0]
-    ld {dst: reg} {address: u8} -> { assert(address <= 0xff), 0b01 @ dst[2:0] @ 0b111 @ address }
-
-    st {src: reg} [{addr: reg}] -> 0b10 @ src[2:0] @ addr[2:0]
-    st {src: reg} {address: u8} -> { assert(address <= 0xff), 0b10 @ src[2:0] @ 0b111 @ address }
-
-    {op: alu_op} {operand_1: reg} {operand_2: reg} -> 0b11 @ op[1:0] @ operand_1[1:0] @ operand_2[1:0]
-    {op: alu_op}i {value: i8} {dst: reg} -> { assert(value <= 0xff), 0b1011 @ op[1:0] @ dst[1:0] @ value }
-
-    not ->	0b01111010
-    rll	->	0b01111101
-    rlr	->	0b01111110
-    sll	->	0b01111011
-    slr	->	0b01111100
-
-    cmp $b -> 0b10101110
-    cmp $c -> 0b01000110
-    cmp $d -> 0b01001110
-    cmp {value: i8} -> { assert(value <= 0xff), 0b10000110 @ value }
-
-    push {data: reg} -> 0b10 @ data[2:0] @ 0b100
-    pop {data: reg} -> 0b01 @ data[2:0] @ 0b100
-    ret -> 0b01 @ 3'5 @ 0b100
-
-    jal {address: u8} -> { assert(address <= 0xff), 0b10 @ 3'5 @ 0b100 @ address }
-    jc	{address: u8} -> { assert(address <= 0xff), 0b00110111 @ address }
-    jz	{address: u8} -> { assert(address <= 0xff), 0b00111111 @ address }
-
-    exr 0	-> 0b01111000
-    exr 1	-> 0b01111001
-
-    exw 0 0	-> 0b00000111
-    exw 0 1	-> 0b00001111
-    exw 0 2 -> 0b10001110
-    exw 0 3 -> 0b10010110
-
-    exw 1 0	-> 0b00010111
-    exw 1 1	-> 0b00011111
-    exw 1 2 -> 0b10011110
-    exw 2 3 -> 0b10100110
-
-    je0	{address: u8} -> { assert(address <= 0xff), 0b00100111 @ address }
-    je1	{address: u8} -> { assert(address <= 0xff), 0b00101111 @ address }
+    $a   => 0
+    $b   => 1
+    $c   => 2
+    $d   => 3
+    $sp  => 4
+    $pc  => 5
+    $out => 6
 }
 
-#bank ".instr"
+#subruledef alu_op
+{
+    add => 0
+    sub => 1
+    or  => 2
+    and => 3
+}
+
+#ruledef cpu
+{
+    nop => 0x00
+    hlt => 0b01111111
+
+    ldi {dst: reg} 0 => 0b11 @ 0b01 @ 0b00 @ dst[1:0]
+
+    mov {src: reg} {dst: reg} => 0b00 @ src[2:0] @ dst[2:0]
+    ldi {dst: reg} {value: i8} => { assert(value <= 0xff), 0b00 @ 0b111 @ dst[2:0] @ value }
+    out => 0b00000110
+    out	{value: reg} => 0b00 @ value[2:0] @ 0b110
+    out {value: i8} => { assert(value <= 0xff), 0b00 @ 0b111 @ 0b110 @ value }
+
+    j {address: u8} => { assert(address <= 0xff), 0b00 @ 0b111 @ 5`3 @ address }
+
+    ld {dst: reg} [{addr: reg}] => 0b01 @ dst[2:0] @ addr[2:0]
+    ld {dst: reg} {address: u8} => { assert(address <= 0xff), 0b01 @ dst[2:0] @ 0b111 @ address }
+
+    st {src: reg} [{addr: reg}] => 0b10 @ src[2:0] @ addr[2:0]
+    st {src: reg} {address: u8} => { assert(address <= 0xff), 0b10 @ src[2:0] @ 0b111 @ address }
+
+    {op: alu_op} {operand_1: reg} {operand_2: reg} => 0b11 @ op[1:0] @ operand_1[1:0] @ operand_2[1:0]
+    {op: alu_op}i {value: i8} {dst: reg} => { assert(value <= 0xff), 0b1011 @ op[1:0] @ dst[1:0] @ value }
+
+    not =>	0b01111010
+    rll	=>	0b01111101
+    rlr	=>	0b01111110
+    sll	=>	0b01111011
+    slr	=>	0b01111100
+
+    cmp $b => 0b10101110
+    cmp $c => 0b01000110
+    cmp $d => 0b01001110
+    cmp {value: i8} => { assert(value <= 0xff), 0b10000110 @ value }
+
+    push {data: reg} => 0b10 @ data[2:0] @ 0b100
+    pop {data: reg} => 0b01 @ data[2:0] @ 0b100
+    ret => 0b01 @ 5`3 @ 0b100
+
+    jal {address: u8} => { assert(address <= 0xff), 0b10 @ 5`3 @ 0b100 @ address }
+    jc	{address: u8} => { assert(address <= 0xff), 0b00110111 @ address }
+    jz	{address: u8} => { assert(address <= 0xff), 0b00111111 @ address }
+
+    exr 0	=> 0b01111000
+    exr 1	=> 0b01111001
+
+    exw 0 0	=> 0b00000111
+    exw 0 1	=> 0b00001111
+    exw 0 2 => 0b10001110
+    exw 0 3 => 0b10010110
+
+    exw 1 0	=> 0b00010111
+    exw 1 1	=> 0b00011111
+    exw 1 2 => 0b10011110
+    exw 2 3 => 0b10100110
+
+    je0	{address: u8} => { assert(address <= 0xff), 0b00100111 @ address }
+    je1	{address: u8} => { assert(address <= 0xff), 0b00101111 @ address }
+}
+
+#bank instr

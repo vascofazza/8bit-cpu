@@ -1,11 +1,11 @@
 ;--- quick sort ---
 #include "lib/mk1.cpu"
 
-#bank ".data"
+#bank data
 data: #d8 123, 110, 20, 13, 222, 94, 205, 199, 213, 176, 58, 160, 216, 12, 73, 172, 184, 225, 125, 63, 186, 111, 252, 136, 242, 92, 101, 134, 175, 126, 195, 2, 42, 57, 149, 23, 223, 48, 214, 217
 vector_len = pc - data
 vector: #res vector_len
-#bank ".instr"
+#bank instr
 
 init:
   jal init_display
@@ -60,11 +60,11 @@ quick_sort:
 .return:
   ret
 
-#bank ".data"
+#bank data
 pivot: #res 1
 i: #res 1
 j: #res 1
-#bank ".instr"
+#bank instr
 partition: ;low, high
   mov $a $c ; c = low
   mov $b $a

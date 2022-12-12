@@ -1,9 +1,9 @@
 #include "lib/mk1.cpu"
 
-#bank ".data"
-helloworld: #str "Hello, world!\0"
+#bank data
+helloworld: #d "Hello, world!\0"
 
-#bank ".instr"
+#bank instr
 main:
   jal init_display
   ldi $b helloworld

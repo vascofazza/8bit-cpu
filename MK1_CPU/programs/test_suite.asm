@@ -49,10 +49,10 @@ test_02:
   out 2
 
 ;--- LOAD ---
-#bank ".data"
+#bank data
 variable: #d8 0x55
 variable_location: #d8 variable
-#bank ".instr"
+#bank instr
 test_03:
   ld $a variable
   cmp 0x55
@@ -72,10 +72,10 @@ test_04:
 
 ;--- STORE ---
 
-#bank ".data"
+#bank data
 value = 0x42
 store_variable: #res 1
-#bank ".instr"
+#bank instr
 test_05:
   ldi $a value
   st $a store_variable

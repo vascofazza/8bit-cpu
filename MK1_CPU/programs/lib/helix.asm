@@ -2,9 +2,9 @@
 
 SPACE = 32
 
-#bank ".data"
+#bank data
 _ready: #d8 1
-#bank ".instr"
+#bank instr
 
 init_display:
   ldi $a 1
