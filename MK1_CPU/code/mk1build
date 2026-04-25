@@ -1,0 +1,40 @@
+#!/bin/bash
+# MK1 C Build Pipeline: compile → assemble → link → binary
+# Usage: mk1build program.c [-o output.bin]
+
+TOOLDIR="$(dirname "$0")"
+INPUT="$1"
+OUTPUT="${INPUT%.c}.bin"
+ASM="${INPUT%.c}.asm"
+OBJ="${INPUT%.c}.o"
+
+if [ -z "$INPUT" ]; then
+    echo "Usage: mk1build <source.c> [-o output.bin]"
+    exit 1
+fi
+
+if [ "$2" = "-o" ] && [ -n "$3" ]; then
+    OUTPUT="$3"
+fi
+
+echo "=== MK1 Build: $INPUT ==="
+
+# Step 1: C → Assembly (vbcc)
+"$TOOLDIR/vbccmk1" -O=1 "$INPUT" -o="$ASM" 2>&1 | grep -v "^vbcc"
+if [ ${PIPESTATUS[0]} -ne 0 ]; then echo "Compile failed."; exit 1; fi
+
+# Step 2: Assembly → Object (vasm)  
+"$TOOLDIR/vasmmk1" -Fvobj -o "$OBJ" "$ASM" 2>&1 | grep -v "^vasm"
+if [ ${PIPESTATUS[0]} -ne 0 ]; then echo "Assemble failed."; exit 1; fi
+
+# Step 3: Object → Binary (mk1link)
+python3 "$TOOLDIR/mk1link.py" "$OBJ" -o "$OUTPUT" 2>&1
+if [ $? -ne 0 ]; then echo "Link failed."; exit 1; fi
+
+# Also generate assembly-only output for the web IDE
+"$TOOLDIR/vasmmk1" -Fbin -o "${INPUT%.c}_flat.bin" "$ASM" 2>/dev/null
+
+echo "=== Done ==="
+
+# Cleanup intermediate files
+rm -f "$OBJ"

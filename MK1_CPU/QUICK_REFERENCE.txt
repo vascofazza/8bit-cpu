@@ -1,0 +1,175 @@
+================================================================================
+MK1 CPU HARDWARE MOD - QUICK REFERENCE GUIDE
+================================================================================
+
+COMPONENT PINOUT VERIFICATION (From Schematics)
+================================================================================
+
+U11 (74HCT173) - 4-BIT LATCH
+────────────────────────────
+Pin  1: OE1           → Net __unnamed_80        (output enable 1 - FLOATING)
+Pin  2: OE2           → Net __unnamed_80        (output enable 2 - FLOATING)
+Pin  3: Q0 (Output)   → Net CF                  (Carry Flag)
+Pin  4: Q1 (Output)   → Net ZF                  (Zero Flag)
+Pin  5: Q2 (Output)   → Net __unnamed_81        (YOUR MOD SOURCE)
+Pin  6: Q3 (Output)   → Net __unnamed_82
+Pin  7: Cp (CLOCK)    → Net CLK                 (System clock)
+Pin  8: GND           → Net __unnamed_85
+Pin  9: E1 (Enable)   → Net ~{FI}               (ACTIVE-LOW, input enable)
+Pin 10: E2 (Enable)   → Net ~{FI}               (ACTIVE-LOW, input enable)
+Pin 11: D3 (Data In)  → Net __unnamed_83
+Pin 12: D2 (Data In)  → Net __unnamed_84        (YOUR MOD TARGET)
+Pin 13: D1 (Data In)  → Net __unnamed_75
+Pin 14: D0 (Data In)  → Net __unnamed_16
+Pin 15: MR (Reset)    → Net CLR                 (ACTIVE-LOW, master reset)
+Pin 16: VCC           → Net __unnamed_86
+
+CONTROL SIGNAL SOURCES
+──────────────────────
+CLK:     From U10 Pin 13 (inverted clock)
+~{FI}:   From U60 Pin 8 (74HCT04 inverter)
+         Source of FI input to U60: NEEDS VERIFICATION
+CLR:     From control.kicad_sch (likely U60 inverter stage)
+
+================================================================================
+
+U24 (74HCT86) - QUAD 2-INPUT XOR GATE
+──────────────────────────────────────
+Pin  1: A1 (Input)    → Net NOT                 (Gate 1)
+Pin  2: B1 (Input)    → Net __unnamed_35        (Gate 1)
+Pin  3: Y1 (Output)   → Net __unnamed_27        (Gate 1 → U16 Pin 7)
+Pin  4: A2 (Input)    → FLOATING                (Gate 2 - YOUR MOD)
+Pin  5: B2 (Input)    → FLOATING                (Gate 2 - YOUR MOD)
+Pin  6: Y2 (Output)   → FLOATING                (Gate 2 - YOUR MOD)
+Pin  7: GND           → Net __unnamed_201
+Pin  8: A3 (Input)    → FLOATING                (Gate 3 - Unused)
+Pin  9: B3 (Input)    → FLOATING                (Gate 3 - Unused)
+Pin 10: Y3 (Output)   → FLOATING                (Gate 3 - Unused)
+Pin 11: Y4 (Output)   → FLOATING                (Gate 4 - Unused)
+Pin 12: A4 (Input)    → FLOATING                (Gate 4 - Unused)
+Pin 13: B4 (Input)    → FLOATING                (Gate 4 - Unused)
+Pin 14: VCC           → Net __unnamed_202
+
+STATUS: Gate 2 is COMPLETELY UNUSED - safe for modification
+
+================================================================================
+
+U76 (AM29F040) - EEPROM (PLCC-32)
+──────────────────────────────────
+Pin 17: D3 (Data 3)   → Net __unnamed_50        (YOUR MOD SOURCE)
+
+VERIFICATION: ✓ CONFIRMED D3 (data bit 3 output)
+
+PLCC-32 Notes:
+- Counter-clockwise numbering from notch
+- Pin 8 = GND, Pin 32 = VCC
+- Multiple data outputs possible (pins 9-16 are D0-D7 "A", pins 17-21 are D0-D4 "B")
+- Pin 17 is definitely D3
+
+================================================================================
+
+U36 (28C64) - SRAM (DIP-28)
+────────────────────────────
+Pin 21: A10 (Address)  → Net __unnamed_44       (YOUR MOD TARGET)
+
+VERIFICATION: ✓ CONFIRMED A10 (address bit 10)
+
+DIP-28 Notes:
+- Standard 8K x 8 SRAM pinout
+- Pin 14 = GND, Pin 28 = VCC
+- Pins 20, 22 (~CE, ~OE) = chip/output enable (both on __unnamed_43)
+- Pin 27 (~WE) = write enable
+
+================================================================================
+
+U60 (74HCT04) - HEX INVERTER (in control.kicad_sch)
+────────────────────────────────────────────────────
+Pin  7: Input to stage  → SOURCE UNCLEAR (need to verify!)
+Pin  8: Output (~{FI})  → Net ~{FI} → U11 Pins 9,10
+
+ISSUE: Pin 7 input source not documented in ALU sheet
+NEED TO CHECK: What drives U60 Pin 7? Where does FI come from?
+
+================================================================================
+
+YOUR MOD WIRING (As Stated)
+================================================================================
+
+Connection 1: U76 Pin 17 → U24 Pin 5
+   U76 Pin 17 (D3 EEPROM output)  →  U24 Pin 5 (XOR gate 2 B input)
+   ✓ Correct direction (output → input)
+   Net to use: Create new net or use __unnamed_50
+
+Connection 2: U11 Pin 5 → U24 Pin 6
+   U11 Pin 5 (Q2 latch output)  →  U24 Pin 6 (XOR gate 2 Y output)
+   ⚠️ CONFLICTING: You're wiring output → output (gate 2 Y is output!)
+   CORRECTED: Should be U11 Pin 5 → U24 Pin 4 (XOR A input)
+
+Connection 3: U24 Pin 4 → U11 Pin 12
+   U24 Pin 4 (XOR gate 2 A input)  →  U11 Pin 12 (D2 data input)
+   ⚠️ CONFLICTING: You're wiring input → input!
+   CORRECTED: Should be U24 Pin 6 (XOR Y output) → U11 Pin 12 (D2 data input)
+
+Connection 4: U11 Pin 5 → U36 Pin 21
+   U11 Pin 5 (Q2 latch output)  →  U36 Pin 21 (A10 address input)
+   ✓ Correct direction (output → input)
+   Net to use: Create new net or use __unnamed_81
+
+================================================================================
+
+LIKELY CORRECTED MOD INTENTION
+================================================================================
+
+Assuming you want:  Q2 XOR D3 → D2 input (to get Q2 := Q2 XOR D3 each clock)
+
+Then wiring should be:
+
+  U11 Pin 5 (Q2 output) ──→ U24 Pin 4 (XOR A input)
+  U76 Pin 17 (D3 output) ──→ U24 Pin 5 (XOR B input)
+  U24 Pin 6 (XOR Y output) ──→ U11 Pin 12 (D2 input)
+  (optional: U11 Pin 5 ──→ U36 Pin 21 for A10 address bit)
+
+This creates combinational logic:
+  U24 output = Q2 XOR D3
+  On next clock rising edge (when ~{FI}=LOW and E1/E2=LOW):
+    U11 Q2 := U24 output = Q2_old XOR D3
+
+================================================================================
+
+CRITICAL ISSUES TO RESOLVE
+================================================================================
+
+1. FLOATING OUTPUT ENABLES
+   Problem: U11 Pins 1,2 (OE1/OE2) on net __unnamed_80
+   Status: No driver found - outputs may be high-impedance
+   Action: Find what should drive OE or confirm it's intentional
+
+2. FI SIGNAL SOURCE
+   Problem: U60 Pin 7 input (what gets inverted to ~{FI}) not documented
+   Status: Analyzer shows GND but that's likely wrong
+   Action: Check control.kicad_sch for actual FI source
+
+3. TIMING CONSTRAINTS
+   Problem: XOR propagation + setup/hold time of latch
+   XOR delay:    ~10ns typical (74HCT86)
+   Setup time:   ~10-12ns (74HCT173)
+   Hold time:    ~1-2ns (74HCT173)
+   Action: Verify clock period allows Q2 → XOR → D2 → latched before next clock
+
+4. LOGIC VERIFICATION
+   Problem: Creating feedback loop Q2 → XOR → D2 → Q2
+   Status: Need to verify this is intentional
+   Action: Confirm the XOR feedback path is what you want
+
+================================================================================
+
+FILES GENERATED FOR THIS ANALYSIS
+================================================================================
+
+/Users/gadyke/8bit-cpu/MK1_CPU/HARDWARE_MOD_ANALYSIS.md (comprehensive)
+/Users/gadyke/8bit-cpu/MK1_CPU/QUICK_REFERENCE.txt (this file)
+/Users/gadyke/8bit-cpu/MK1_CPU/mk1_newkicad/alu_analysis.json (schematic data)
+/Users/gadyke/8bit-cpu/MK1_CPU/mk1_newkicad/control_analysis.json
+/Users/gadyke/8bit-cpu/MK1_CPU/mk1_newkicad/output_analysis.json
+
+================================================================================

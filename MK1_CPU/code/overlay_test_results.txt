@@ -1,0 +1,26 @@
+OVERLAY TEST RESULTS
+19 PASS, 3 FAIL, 1 ERROR
+
+FAIL: 1: Known values from overlay — hist=[1]
+PASS: 2: ddra@2 — readback=2
+PASS: 2: ddra@10 — readback=2
+PASS: 2: ddra@30 — readback=2
+PASS: 2: ddra@50 — readback=2
+PASS: 2: ddra@65 — readback=2
+PASS: 2: ddra@70 — readback=2
+PASS: 2: ddra@100 — readback=2
+PASS: 2: ddra@128 — readback=2
+PASS: 2: ddra@150 — readback=2
+PASS: 2: ddra@200 — readback=2
+PASS: 2B: ora@2 — IRA=1 (pin state)
+PASS: 2B: ora@50 — IRA=1 (pin state)
+PASS: 2B: ora@65 — IRA=0 (pin state)
+PASS: 2B: ora@100 — IRA=0 (pin state)
+PASS: 2B: ora@200 — IRA=0 (pin state)
+PASS: 3: ddrb@2 — readback=3
+PASS: 3: ddrb@65 — readback=3
+PASS: 3: ddrb@100 — readback=3
+PASS: 3: ddrb@200 — readback=3
+FAIL: 4A: DDRA from overlay (readback) — hist=[1]
+ERROR: 4B: DDRB from overlay (two-stage boot) — ASM error: {'ok': False, 'errors': 1, 'detail': [{'line': 65, 'msg': 'Undefined symbol: _ddrb_imm'}]}
+FAIL: 5: Tone overlay — hist=[1] (expect 1 and 99)

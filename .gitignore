@@ -1,3 +1,36 @@
 .DS_Store
 *.sch-bak
 *.kicad_pcb-bak
+__pycache__/
+
+# KiCad generated/transient
+*.kicad_prl
+*-backups/
+.history/
+
+# Generated analysis JSON (expensive to regenerate but not source)
+*_analysis.json
+*_analysis_v10.json
+
+# Generated bodge diagrams and PCB exports
+bodge_*.png
+bodge_*.svg
+code_banking_bodge.svg
+back_copper.pdf
+back_full.svg
+front_full.svg
+
+# KiCad lock files
+*.lck
+
+# Duplicate KiCad project (conversion artifact)
+MK1_CPU/mk1_newkicad/
+
+# Stray root-level generated binaries
+/microcode.bin
+/microcode.txt
+
+# PlatformIO build artifacts
+.pio/
+MK1_CPU/code/test*.c
+a.out

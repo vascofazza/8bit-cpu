@@ -1,0 +1,212 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 750" font-family="monospace" font-size="11">
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="none" stroke="#333" stroke-width="1"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1100" height="750" fill="#fafafa" stroke="#ccc"/>
+
+  <!-- Title -->
+  <text x="550" y="30" text-anchor="middle" font-size="16" font-weight="bold" fill="#222">MK1 Daughter Board — 74HC652 GPIO Interface</text>
+  <text x="550" y="48" text-anchor="middle" font-size="10" fill="#666">Bidirectional I/O port for I2C, SPI, Speaker, Display Mode</text>
+
+  <!-- ═══ J4 CONNECTOR ═══ -->
+  <rect x="30" y="80" width="120" height="380" rx="4" fill="#e8e8f0" stroke="#444" stroke-width="2"/>
+  <text x="90" y="100" text-anchor="middle" font-weight="bold" font-size="12" fill="#333">J4 (MK1)</text>
+
+  <!-- J4 pins - left column (odd) -->
+  <text x="42" y="130" font-size="9" fill="#555">1  IRQ0</text>
+  <text x="42" y="152" font-size="9" fill="#555">3  IRQ1</text>
+  <text x="42" y="174" font-size="9" fill="#555">5  E0</text>
+  <text x="42" y="196" font-size="9" fill="#555">7  E1</text>
+  <text x="42" y="218" font-size="9" fill="#006600">9  U0</text>
+  <text x="42" y="240" font-size="9" fill="#006600">11 U1</text>
+  <text x="42" y="262" font-size="9" fill="#555">13 CLR</text>
+  <text x="42" y="284" font-size="9" fill="#555">15 CLK</text>
+  <text x="42" y="306" font-size="9" fill="#c00">17 GND</text>
+
+  <!-- J4 pins - right column (even) -->
+  <text x="95" y="130" font-size="9" fill="#0000aa">D0  2</text>
+  <text x="95" y="152" font-size="9" fill="#0000aa">D1  4</text>
+  <text x="95" y="174" font-size="9" fill="#0000aa">D2  6</text>
+  <text x="95" y="196" font-size="9" fill="#0000aa">D3  8</text>
+  <text x="95" y="218" font-size="9" fill="#0000aa">D4 10</text>
+  <text x="95" y="240" font-size="9" fill="#0000aa">D5 12</text>
+  <text x="95" y="262" font-size="9" fill="#0000aa">D6 14</text>
+  <text x="95" y="284" font-size="9" fill="#0000aa">D7 16</text>
+  <text x="95" y="306" font-size="9" fill="#c00">VCC 18</text>
+
+  <!-- ═══ 74HC652 ═══ -->
+  <rect x="300" y="100" width="200" height="340" rx="4" fill="#fff8e0" stroke="#444" stroke-width="2"/>
+  <text x="400" y="90" text-anchor="middle" font-weight="bold" font-size="13" fill="#333">74HC652</text>
+  <text x="400" y="105" text-anchor="middle" font-size="9" fill="#666">Octal Registered Transceiver</text>
+
+  <!-- A-side pins (left) -->
+  <text x="310" y="135" font-size="10" fill="#0000aa">A0</text>
+  <text x="310" y="160" font-size="10" fill="#0000aa">A1</text>
+  <text x="310" y="185" font-size="10" fill="#0000aa">A2</text>
+  <text x="310" y="210" font-size="10" fill="#0000aa">A3</text>
+  <text x="310" y="235" font-size="10" fill="#0000aa">A4</text>
+  <text x="310" y="260" font-size="10" fill="#0000aa">A5</text>
+  <text x="310" y="285" font-size="10" fill="#0000aa">A6</text>
+  <text x="310" y="310" font-size="10" fill="#0000aa">A7</text>
+
+  <!-- B-side pins (right) -->
+  <text x="468" y="135" font-size="10" fill="#880000">B0</text>
+  <text x="468" y="160" font-size="10" fill="#880000">B1</text>
+  <text x="468" y="185" font-size="10" fill="#880000">B2</text>
+  <text x="468" y="210" font-size="10" fill="#880000">B3</text>
+  <text x="468" y="235" font-size="10" fill="#880000">B4</text>
+  <text x="468" y="260" font-size="10" fill="#880000">B5</text>
+  <text x="468" y="285" font-size="10" fill="#880000">B6</text>
+  <text x="468" y="310" font-size="10" fill="#880000">B7</text>
+
+  <!-- Control pins (bottom) -->
+  <text x="310" y="345" font-size="9" fill="#006600">CLKAB</text>
+  <text x="310" y="362" font-size="9" fill="#006600">OEAB</text>
+  <text x="310" y="379" font-size="9" fill="#006600">OEBA</text>
+  <text x="310" y="396" font-size="9" fill="#888">SAB→GND</text>
+  <text x="310" y="413" font-size="9" fill="#888">SBA→VCC</text>
+
+  <!-- ═══ DATA BUS WIRES (J4 → 652 A-side) ═══ -->
+  <line x1="150" y1="127" x2="300" y2="132" stroke="#0000aa" stroke-width="1.5"/>
+  <line x1="150" y1="149" x2="300" y2="157" stroke="#0000aa" stroke-width="1.5"/>
+  <line x1="150" y1="171" x2="300" y2="182" stroke="#0000aa" stroke-width="1.5"/>
+  <line x1="150" y1="193" x2="300" y2="207" stroke="#0000aa" stroke-width="1.5"/>
+  <line x1="150" y1="215" x2="300" y2="232" stroke="#0000aa" stroke-width="1.5"/>
+  <line x1="150" y1="237" x2="300" y2="257" stroke="#0000aa" stroke-width="1.5"/>
+  <line x1="150" y1="259" x2="300" y2="282" stroke="#0000aa" stroke-width="1.5"/>
+  <line x1="150" y1="281" x2="300" y2="307" stroke="#0000aa" stroke-width="1.5"/>
+
+  <!-- ═══ CONTROL WIRES ═══ -->
+  <!-- U0 → CLKAB -->
+  <line x1="150" y1="215" x2="200" y2="215" stroke="#006600" stroke-width="1.5"/>
+  <line x1="200" y1="215" x2="200" y2="342" stroke="#006600" stroke-width="1.5"/>
+  <line x1="200" y1="342" x2="300" y2="342" stroke="#006600" stroke-width="1.5"/>
+
+  <!-- U1 → OEAB + inverter → OEBA -->
+  <line x1="150" y1="237" x2="180" y2="237" stroke="#006600" stroke-width="1.5"/>
+  <line x1="180" y1="237" x2="180" y2="359" stroke="#006600" stroke-width="1.5"/>
+  <line x1="180" y1="359" x2="300" y2="359" stroke="#006600" stroke-width="1.5"/>
+
+  <!-- Inverter symbol for OEBA -->
+  <rect x="220" y="368" width="50" height="24" rx="3" fill="#ffe0e0" stroke="#666"/>
+  <text x="245" y="384" text-anchor="middle" font-size="8" fill="#333">2N7000</text>
+  <text x="245" y="394" text-anchor="middle" font-size="7" fill="#666">NOT(U1)</text>
+  <line x1="180" y1="376" x2="220" y2="376" stroke="#006600" stroke-width="1" stroke-dasharray="3,2"/>
+  <line x1="270" y1="376" x2="300" y2="376" stroke="#006600" stroke-width="1.5"/>
+
+  <!-- ═══ B-SIDE TO PERIPHERALS ═══ -->
+
+  <!-- B0: SDA read-back (INPUT) -->
+  <line x1="500" y1="132" x2="700" y2="132" stroke="#c00" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <rect x="700" y="122" width="110" height="20" rx="3" fill="#ffe0e0" stroke="#c00"/>
+  <text x="755" y="136" text-anchor="middle" font-size="9" fill="#c00">SDA READ-BACK</text>
+  <text x="755" y="148" font-size="8" fill="#888">(INPUT from SDA line)</text>
+
+  <!-- B1: spare -->
+  <line x1="500" y1="157" x2="560" y2="157" stroke="#888" stroke-width="1"/>
+  <text x="565" y="161" font-size="9" fill="#888">spare</text>
+
+  <!-- B2: spare -->
+  <line x1="500" y1="182" x2="560" y2="182" stroke="#888" stroke-width="1"/>
+  <text x="565" y="186" font-size="9" fill="#888">spare</text>
+
+  <!-- B3: spare -->
+  <line x1="500" y1="207" x2="560" y2="207" stroke="#888" stroke-width="1"/>
+  <text x="565" y="211" font-size="9" fill="#888">spare</text>
+
+  <!-- B4: Display Mode -->
+  <line x1="500" y1="232" x2="700" y2="232" stroke="#006600" stroke-width="1.5"/>
+  <rect x="700" y="222" width="110" height="20" rx="3" fill="#e0ffe0" stroke="#060"/>
+  <text x="755" y="236" text-anchor="middle" font-size="9" fill="#060">DISPLAY MODE</text>
+  <text x="755" y="248" font-size="8" fill="#888">→ bodge to U36 A10</text>
+
+  <!-- B5: Speaker -->
+  <line x1="500" y1="257" x2="580" y2="257" stroke="#333" stroke-width="1.5"/>
+  <rect x="580" y="247" width="40" height="20" rx="3" fill="#f0f0f0" stroke="#666"/>
+  <text x="600" y="261" text-anchor="middle" font-size="8">1K</text>
+  <line x1="620" y1="257" x2="660" y2="257" stroke="#333" stroke-width="1.5"/>
+  <!-- NPN -->
+  <rect x="660" y="243" width="50" height="28" rx="3" fill="#f0f0ff" stroke="#666"/>
+  <text x="685" y="259" text-anchor="middle" font-size="8" fill="#333">NPN</text>
+  <text x="685" y="269" text-anchor="middle" font-size="7" fill="#666">BC547</text>
+  <line x1="710" y1="257" x2="750" y2="257" stroke="#333" stroke-width="1.5"/>
+  <!-- Piezo -->
+  <rect x="750" y="245" width="55" height="24" rx="3" fill="#fff0e0" stroke="#884400"/>
+  <text x="777" y="261" text-anchor="middle" font-size="9" fill="#884400">PIEZO</text>
+
+  <!-- B6: I2C SCL -->
+  <line x1="500" y1="282" x2="700" y2="282" stroke="#006600" stroke-width="1.5"/>
+  <rect x="700" y="272" width="110" height="20" rx="3" fill="#e0f0ff" stroke="#006"/>
+  <text x="755" y="286" text-anchor="middle" font-size="9" fill="#006">I2C SCL</text>
+  <!-- SCL pull-up -->
+  <line x1="810" y1="282" x2="850" y2="282" stroke="#006" stroke-width="1"/>
+  <rect x="850" y="275" width="35" height="14" rx="2" fill="#f8f8f8" stroke="#888"/>
+  <text x="867" y="286" text-anchor="middle" font-size="7">4.7K</text>
+  <line x1="885" y1="282" x2="900" y2="282" stroke="#c00" stroke-width="1"/>
+  <text x="908" y="286" font-size="8" fill="#c00">VCC</text>
+
+  <!-- B7: I2C SDA (via MOSFET) -->
+  <line x1="500" y1="307" x2="580" y2="307" stroke="#006600" stroke-width="1.5"/>
+  <!-- SDA MOSFET -->
+  <rect x="580" y="295" width="60" height="24" rx="3" fill="#ffe0e0" stroke="#666"/>
+  <text x="610" y="309" text-anchor="middle" font-size="8" fill="#333">2N7000</text>
+  <text x="610" y="319" text-anchor="middle" font-size="7" fill="#666">open-drain</text>
+  <line x1="640" y1="307" x2="700" y2="307" stroke="#006600" stroke-width="1.5"/>
+  <rect x="700" y="297" width="110" height="20" rx="3" fill="#e0f0ff" stroke="#006"/>
+  <text x="755" y="311" text-anchor="middle" font-size="9" fill="#006">I2C SDA</text>
+  <!-- SDA pull-up -->
+  <line x1="810" y1="307" x2="850" y2="307" stroke="#006" stroke-width="1"/>
+  <rect x="850" y="300" width="35" height="14" rx="2" fill="#f8f8f8" stroke="#888"/>
+  <text x="867" y="311" text-anchor="middle" font-size="7">4.7K</text>
+  <line x1="885" y1="307" x2="900" y2="307" stroke="#c00" stroke-width="1"/>
+  <text x="908" y="311" font-size="8" fill="#c00">VCC</text>
+
+  <!-- SDA read-back wire (SDA line → B0) -->
+  <line x1="755" y1="317" x2="755" y2="340" stroke="#c00" stroke-width="1" stroke-dasharray="4,2"/>
+  <line x1="755" y1="340" x2="830" y2="340" stroke="#c00" stroke-width="1" stroke-dasharray="4,2"/>
+  <line x1="830" y1="340" x2="830" y2="132" stroke="#c00" stroke-width="1" stroke-dasharray="4,2"/>
+  <line x1="830" y1="132" x2="810" y2="132" stroke="#c00" stroke-width="1" stroke-dasharray="4,2"/>
+  <text x="840" y="240" font-size="8" fill="#c00" transform="rotate(90, 840, 240)">SDA read-back wire</text>
+
+  <!-- ═══ IRQ (separate from 652) ═══ -->
+  <line x1="150" y1="127" x2="170" y2="127" stroke="#555" stroke-width="1"/>
+  <line x1="170" y1="127" x2="170" y2="80" stroke="#555" stroke-width="1"/>
+  <line x1="170" y1="80" x2="700" y2="80" stroke="#555" stroke-width="1" stroke-dasharray="4,2"/>
+  <rect x="700" y="70" width="140" height="20" rx="3" fill="#f0e0ff" stroke="#606"/>
+  <text x="770" y="84" text-anchor="middle" font-size="9" fill="#606">DS3231 SQW + 10K↑</text>
+  <text x="770" y="64" font-size="8" fill="#888">IRQ0 — clock calibration (direct to J4, not through 652)</text>
+
+  <!-- ═══ POWER ═══ -->
+  <rect x="30" y="480" width="780" height="85" rx="4" fill="#f0f8f0" stroke="#484" stroke-width="1"/>
+  <text x="40" y="498" font-weight="bold" font-size="11" fill="#333">POWER &amp; DECOUPLING</text>
+  <text x="40" y="516" font-size="10">J4 Pin 18 (VCC) → 652 VCC + peripheral VCC + pull-ups</text>
+  <text x="40" y="532" font-size="10">J4 Pin 17 (GND) → 652 GND + peripheral GND + MOSFET sources + NPN emitter</text>
+  <text x="40" y="548" font-size="10">100nF ceramic cap: VCC to GND near 652</text>
+
+  <!-- ═══ SOFTWARE REFERENCE ═══ -->
+  <rect x="30" y="580" width="520" height="155" rx="4" fill="#f0f0ff" stroke="#448" stroke-width="1"/>
+  <text x="40" y="598" font-weight="bold" font-size="11" fill="#333">SOFTWARE BIT MAP</text>
+  <text x="40" y="616" font-size="10">Write: exw(val, 1, 1)  Read: gpio_read (opcode 0xC5)</text>
+  <text x="40" y="636" font-size="10" fill="#0000aa">Bit 7 (0x80): SDA out    INVERTED (1=LOW, 0=HIGH)</text>
+  <text x="40" y="652" font-size="10" fill="#006">Bit 6 (0x40): SCL         (1=HIGH, 0=LOW)</text>
+  <text x="40" y="668" font-size="10" fill="#884400">Bit 5 (0x20): Speaker     (toggle for tone)</text>
+  <text x="40" y="684" font-size="10" fill="#060">Bit 4 (0x10): Display     (0=mode A, 1=mode B)</text>
+  <text x="40" y="700" font-size="10" fill="#888">Bit 3-1:      spare outputs</text>
+  <text x="40" y="716" font-size="10" fill="#c00">Bit 0 (0x01): SDA in      (read-back, INPUT)</text>
+
+  <!-- ═══ NOTES ═══ -->
+  <rect x="570" y="580" width="500" height="155" rx="4" fill="#fff8f0" stroke="#864" stroke-width="1"/>
+  <text x="580" y="598" font-weight="bold" font-size="11" fill="#333">NOTES</text>
+  <text x="580" y="616" font-size="9">gpio_read briefly floats ALL B outputs (~1us settle)</text>
+  <text x="580" y="632" font-size="9">Pull-ups hold I2C idle during float window</text>
+  <text x="580" y="648" font-size="9">SPI: add 10K pull-down on CS to hold LOW during float</text>
+  <text x="580" y="664" font-size="9">Display mode: 1 bodge wire → U36 A10 (DIP switch OFF)</text>
+  <text x="580" y="680" font-size="9">Microcode: fix exw 1 1 timing + add gpio_read opcode</text>
+  <text x="580" y="696" font-size="9">IRQ0 (RTC SQW) goes direct to J4, not through 652</text>
+  <text x="580" y="712" font-size="9">VCC + GND from J4 pins 18, 17 — no separate power</text>
+  <text x="580" y="728" font-size="9">BOM: 652 + 2x 2N7000 + NPN + piezo + resistors + cap</text>
+</svg>

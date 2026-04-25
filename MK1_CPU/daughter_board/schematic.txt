@@ -1,0 +1,198 @@
+MK1 DAUGHTER BOARD — 74HC652 GPIO Interface
+═══════════════════════════════════════════════════════════════════════
+
+
+    J4 (MK1)                       74HC652                     Pin Header
+   ┌──────────┐                   ┌───────────────────┐       ┌──────────┐
+   │          │                   │                   │       │          │
+   │ Pin 2 ───┼── D0 ───────────►│ A0          B0  ──┼──────►│ INPUT    │◄── SDA line (read-back)
+   │ Pin 4 ───┼── D1 ───────────►│ A1          B1  ──┼──────►│ SPARE    │    (directly wired from
+   │ Pin 6 ───┼── D2 ───────────►│ A2          B2  ──┼──────►│ SPARE    │     SDA after MOSFET)
+   │ Pin 8 ───┼── D3 ───────────►│ A3          B3  ──┼──────►│ SPARE    │
+   │ Pin 10 ──┼── D4 ───────────►│ A4          B4  ──┼──────►│ DISP MODE│──► U36 A10 (bodge)
+   │ Pin 12 ──┼── D5 ───────────►│ A5          B5  ──┼──────►│ SPEAKER  │──► 1K ──► NPN ──► Piezo
+   │ Pin 14 ──┼── D6 ───────────►│ A6          B6  ──┼──────►│ I2C SCL  │──► SCL + 4.7K pull-up
+   │ Pin 16 ──┼── D7 ───────────►│ A7          B7  ──┼──────►│ I2C SDA  │──► 2N7000 gate
+   │          │                   │                   │       │          │
+   │ Pin 9 ───┼── U0 ───────────►│ CLKAB             │       └──────────┘
+   │ (latch)  │                   │                   │
+   │ Pin 11 ──┼── U1 ──────┬────►│ OEAB              │
+   │ (dir)    │             │     │                   │
+   │          │       ┌─────┴──┐  │                   │
+   │          │       │ 2N7000 │  │                   │
+   │          │       │ INV    │  │                   │
+   │          │       │G    D──┼─►│ OEBA              │
+   │          │       │S    │  │  │                   │
+   │          │       └──┬──┘  │  │                   │
+   │          │          │  10K│  │                   │
+   │ Pin 17 ──┼── GND ──┴─────┘  │                   │
+   │          │                   │                   │
+   │ Pin 17 ──┼── GND ──────────►│ SAB (registered)   │
+   │ Pin 18 ──┼── VCC ──────────►│ SBA (transparent)  │
+   │ Pin 18 ──┼── VCC ──────────►│ VCC + 100nF        │
+   │ Pin 17 ──┼── GND ──────────►│ GND                │
+   │          │                   └───────────────────┘
+   │          │
+   │ Pin 1 ───┼── IRQ0 ◄──── DS3231 SQW + 10K pull-up (clock calibration)
+   │ Pin 3 ───┼── IRQ1 ◄──── spare
+   │ Pin 5 ───┼── E0  (used by gpio_read opcode, directly to J4, NOT to 652)
+   │ Pin 7 ───┼── E1  (used by exw for U70 transceiver enable)
+   │ Pin 13 ──┼── CLR  (spare)
+   │ Pin 15 ──┼── CLK  (spare)
+   └──────────┘
+
+
+    2N7000 INVERTER (U1 → NOT(U1) → OEBA)
+    ───────────────────────────────────────
+    U1 (J4 pin 11) ──► Gate
+    GND ──────────────► Source
+    10K to VCC ───┬───► Drain ──► OEBA
+                  │
+    When U1=LOW:  MOSFET OFF, drain pulled HIGH → OEBA=HIGH (B→A disabled)
+    When U1=HIGH: MOSFET ON, drain pulled LOW  → OEBA=LOW  (B→A active)
+
+
+    I2C SDA OPEN-DRAIN (B7 → 2N7000 → SDA line)
+    ──────────────────────────────────────────────
+    B7 (652 output) ──► Gate
+    GND ──────────────► Source
+    SDA line ─────────► Drain ──┬── 4.7K pull-up to VCC
+                                │
+    B0 (652 input) ◄────────────┘  (SDA read-back wired here)
+
+    When B7=HIGH (bit 7=1): MOSFET ON  → SDA pulled LOW
+    When B7=LOW  (bit 7=0): MOSFET OFF → SDA released HIGH (pull-up)
+    NOTE: SDA logic is INVERTED in software (1=LOW, 0=HIGH)
+
+
+    I2C SCL (B6 → direct)
+    ──────────────────────
+    B6 (652 output) ──┬── SCL line ──┬── 4.7K pull-up to VCC
+                      │              │
+                      └──────────────┘
+    Push-pull. Fine for single-master I2C.
+
+
+    SPEAKER (B5 → NPN → piezo)
+    ──────────────────────────
+    B5 (652 output) ──► 1K ──► NPN base
+                               NPN collector ──► Piezo (+)
+                               NPN emitter   ──► GND
+                               Piezo (-)     ──► VCC
+
+
+═══════════════════════════════════════════════════════════════════════
+SOFTWARE INTERFACE
+═══════════════════════════════════════════════════════════════════════
+
+  WRITE:  exw(val, 1, 1)                    [AO|E1|U0]
+          Latches val into A→B register. B outputs drive peripherals.
+          U1 not asserted → OEAB LOW (outputs active), OEBA HIGH (read off).
+
+  READ:   gpio_read  (new opcode 0xC5)      [XI|E0|AI|U1]
+          U1 → OEAB HIGH: B outputs float (pull-ups hold idle)
+          NOT(U1) → OEBA LOW: B→A transparent, peripheral states on A-side
+          XI → U70 input, E0 → U70 enabled, AI → bus into A register.
+          Read B0 (bit 0) for SDA state.  Mask other bits.
+
+
+═══════════════════════════════════════════════════════════════════════
+BIT MAP
+═══════════════════════════════════════════════════════════════════════
+
+  Bit 7 (0x80): I2C SDA output  (INVERTED: 1=LOW, 0=HIGH via 2N7000)
+  Bit 6 (0x40): I2C SCL         (1=HIGH, 0=LOW)
+  Bit 5 (0x20): Speaker         (toggle for tone)
+  Bit 4 (0x10): Display mode    (0=mode A, 1=mode B on U36 A10)
+  Bit 3 (0x08): spare output
+  Bit 2 (0x04): spare output
+  Bit 1 (0x02): spare output
+  Bit 0 (0x01): SDA read-back   (INPUT — reads actual SDA line voltage)
+
+  On read (gpio_read): bit 0 = SDA state. Other bits = latch residue, ignore.
+
+
+═══════════════════════════════════════════════════════════════════════
+KEY SEQUENCES
+═══════════════════════════════════════════════════════════════════════
+
+  Idle:         exw(0x40, 1, 1)              SDA=H, SCL=H
+
+  I2C START:    exw(0x40, 1, 1)              SDA=H, SCL=H
+                exw(0xC0, 1, 1)              SDA=L, SCL=H  (START)
+                exw(0x80, 1, 1)              SDA=L, SCL=L
+
+  I2C bit=1:    exw(0x00, 1, 1)              SDA=H, SCL=L  (setup)
+                exw(0x40, 1, 1)              SDA=H, SCL=H  (clock)
+
+  I2C bit=0:    exw(0x80, 1, 1)              SDA=L, SCL=L  (setup)
+                exw(0xC0, 1, 1)              SDA=L, SCL=H  (clock)
+
+  I2C ACK:      exw(0x00, 1, 1)              SDA=H, SCL=L  (release SDA)
+                gpio_read                     float all, SCL→HIGH (pull-up),
+                                              slave drives SDA, read bit 0
+                exw(0x00, 1, 1)              resume: SDA=H, SCL=L
+
+  I2C STOP:     exw(0x80, 1, 1)              SDA=L, SCL=L
+                exw(0xC0, 1, 1)              SDA=L, SCL=H
+                exw(0x40, 1, 1)              SDA=H, SCL=H  (STOP)
+
+  Speaker:      loop {
+                  exw(0x60, 1, 1)            speaker ON  + I2C idle
+                  (delay)
+                  exw(0x40, 1, 1)            speaker OFF + I2C idle
+                  (delay)
+                }
+
+
+═══════════════════════════════════════════════════════════════════════
+MICROCODE CHANGES (one reflash)
+═══════════════════════════════════════════════════════════════════════
+
+  1. Fix exw 1 1 timing (opcode 0x1F):
+     [MI|PO, RO|II|PE, AO|E1, AO|E1|U0, RST, RST, RST, RST]
+
+  2. New gpio_read opcode (opcode 0xC5, was i2c_start):
+     [MI|PO, RO|II|PE, XI|E0|AI|U1, RST, RST, RST, RST, RST]
+
+
+═══════════════════════════════════════════════════════════════════════
+BOM
+═══════════════════════════════════════════════════════════════════════
+
+  1x  74HC652     (DIP-24, bidirectional registered transceiver)
+  2x  2N7000      (N-ch MOSFET: 1 for OEBA inverter, 1 for SDA open-drain)
+  1x  NPN BC547   (speaker driver)
+  1x  piezo buzzer
+  2x  4.7K        (I2C pull-ups: SDA + SCL)
+  2x  10K         (MOSFET drain pull-ups: OEBA inverter + SDA gate pull-down)
+  1x  1K          (NPN base resistor)
+  2x  100nF       (decoupling)
+  1x  J4 2x9 connector
+  1x  pin header  (GPIO output to peripherals)
+
+
+═══════════════════════════════════════════════════════════════════════
+NOTES
+═══════════════════════════════════════════════════════════════════════
+
+  - gpio_read floats ALL B outputs briefly (~1us settle, 8us step).
+    Pull-ups/pull-downs hold peripheral lines at idle during float.
+    I2C: pull-ups → SCL HIGH, SDA HIGH (slave can pull LOW for ACK).
+    SPI: add 10K pull-down on CS line to hold LOW during float.
+
+  - SDA read-back wire: connect from the SDA LINE (after the 2N7000
+    drain, where the pull-up and slave connect) back to B0 on the 652.
+    During gpio_read: B0 reads the actual SDA voltage.
+
+  - Display mode: one bodge wire from B4 on the pin header to U36 pin 21
+    (A10) on the MK1 main board. DIP switch position for A10 must be OFF.
+
+  - SPI future expansion: use B3=CS, B2=SCK, B1=MOSI. MISO → B0 (shared
+    with SDA read-back — don't use I2C and SPI simultaneously).
+    Or wire MISO to a separate B pin if dedicated input needed.
+
+  - DS3231 RTC SQW → J4 pin 1 (IRQ0) + 10K pull-up for clock calibration.
+    Read via irq0() in software. Not through the 652.
+
+  - VCC and GND available on J4 (pins 18, 17). No separate power wire needed.

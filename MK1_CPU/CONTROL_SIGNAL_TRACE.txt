@@ -1,0 +1,275 @@
+================================================================================
+MK1 CPU - CONTROL SIGNAL TRACE (74HCT173 Input Enable Path)
+================================================================================
+
+THE FI SIGNAL AND INPUT ENABLE LOGIC
+================================================================================
+
+Location: ALU sheet (alu.kicad_sch) and Control sheet (control.kicad_sch)
+
+U11 (74HCT173) Data Latch has ACTIVE-LOW Input Enables:
+  E1 (Pin 9) = ACTIVE-LOW
+  E2 (Pin 10) = ACTIVE-LOW
+  
+  Latching occurs on rising clock edge ONLY when:
+    E1 = LOW (enabled)  AND  E2 = LOW (enabled)
+  
+  When either E1=HIGH or E2=HIGH:
+    Data is NOT latched (locked in place)
+
+Current Schematic Connections:
+  U11 Pin 9 (E1) → Net: ~{FI}
+  U11 Pin 10 (E2) → Net: ~{FI}
+  Both pins tied to same net!
+
+================================================================================
+
+THE ~{FI} SIGNAL SOURCE
+================================================================================
+
+Net Name: ~{FI}
+Meaning: Inverted FI (Frame Interrupt / Fetch Instruction)
+
+Source: U60 Pin 8 (74HCT04 Hex Inverter, in control.kicad_sch)
+
+The ~{FI} path:
+
+  FI (microcode signal from control.kicad_sch)
+    ↓
+    INPUT: U60 Pin 7 (NEEDS VERIFICATION - source location unclear)
+    ↓
+    [INVERSION HAPPENS]
+    ↓
+    OUTPUT: U60 Pin 8 (produces ~{FI})
+    ↓
+    Net: ~{FI}
+    ↓
+    Destinations: U11 Pin 9, U11 Pin 10
+    ↓
+    TestPoint: TP6 Pin 1 (probe point for measurement)
+
+================================================================================
+
+WHY THE INVERSION?
+================================================================================
+
+The 74HCT173 input enables are ACTIVE-LOW (meaning LOW=enabled, HIGH=disabled)
+
+Microcode Control Signal Conventions (typical):
+  FI = HIGH when you WANT to latch (fetch instruction enabled)
+  FI = LOW when you DON'T want to latch (instruction inhibited)
+
+To match the 74HCT173's active-low logic:
+  When FI = HIGH (want to latch)  →  Need E1/E2 = LOW
+  When FI = LOW (don't latch)      →  Need E1/E2 = HIGH
+
+Solution: Invert FI with U60
+  U60 inverts: FI=HIGH becomes ~{FI}=LOW  (correct!)
+              FI=LOW becomes ~{FI}=HIGH   (correct!)
+
+================================================================================
+
+THE CLOCK SIGNAL (U11 Pin 7)
+================================================================================
+
+Net Name: CLK (System Clock)
+
+Source: U10 Pin 13 (logic gate output - likely inverted clock)
+
+The CLK signal path:
+
+  Raw clock from clock.kicad_sch
+    ↓
+    INPUT: U10 Pin ? (unknown input)
+    ↓
+    [LOGIC OPERATION - appears to be inversion]
+    ↓
+    OUTPUT: U10 Pin 13 (produces CLK)
+    ↓
+    Net: CLK
+    ↓
+    Destination: U11 Pin 7 (Cp - Clock pulse input)
+
+Behavior:
+  On every rising edge of CLK:
+    IF E1=LOW and E2=LOW (i.e., ~{FI}=LOW, i.e., FI=HIGH):
+      Q0-Q3 ← D0-D3  (latch the input data)
+    ELSE:
+      Q0-Q3 stay same (data not updated)
+
+================================================================================
+
+THE MASTER RESET SIGNAL (U11 Pin 15)
+================================================================================
+
+Net Name: CLR (Clear)
+
+Source: Likely from U60 inverter stage (control.kicad_sch)
+
+The CLR signal path:
+
+  Reset signal (probably from powerup or manual reset)
+    ↓
+    [INVERSION]  (likely U60 Pin 6 or similar)
+    ↓
+    OUTPUT: produces CLR
+    ↓
+    Net: CLR
+    ↓
+    Destination: U11 Pin 15 (MR - Master Reset input)
+
+Logic (ACTIVE-LOW):
+  When CLR = LOW:   Q0-Q3 ← 0000  (all outputs cleared)
+  When CLR = HIGH:  Normal operation (data loads on clock)
+
+================================================================================
+
+OUTPUT ENABLE SIGNALS (U11 Pins 1, 2)
+================================================================================
+
+Net Name: __unnamed_80
+
+Pins: U11 Pin 1 (OE1), U11 Pin 2 (OE2)
+
+Current Status: NO DRIVER FOUND
+  Both pins on same net but net appears to have no external source
+  This is unusual and may indicate:
+    a) Intentional tri-state (latch outputs always high-impedance)
+    b) Schematic error (net should be connected to control logic)
+    c) Net is floating and will read as HIGH (disabled)
+
+Logic (ACTIVE-LOW):
+  When OE1=LOW and OE2=LOW:   Q0-Q3 outputs drive the bus
+  When OE1=HIGH or OE2=HIGH:  Q0-Q3 in high-impedance (not driving)
+
+IMPLICATION FOR YOUR MOD:
+  If __unnamed_80 is floating/HIGH:
+    U11 Q2 (Pin 5) is NOT actively driving the bus
+    It acts like high-impedance
+    If you tap it for your XOR input, you're reading from a weakly-driven node
+    Could be susceptible to noise or interference
+
+================================================================================
+
+CURRENT LATCH OPERATION
+================================================================================
+
+Assuming normal operation where __unnamed_80 is driven LOW by something:
+
+CLOCK TIMING (in one CLK cycle):
+
+  TIME T0: Setup phase
+    D0-D3 inputs are stable
+    ~{FI} = LOW (meaning FI=HIGH, fetch enabled)
+    CLR = HIGH (meaning not in reset)
+    OE1/OE2 = LOW (meaning outputs enabled)
+
+  TIME T0→T1: Rising edge of CLK
+    Event: Latch captures input data
+    Action: Q0-Q3 ← D0-D3
+    Delay: <10ns (propagation time)
+
+  TIME T1: Hold phase
+    New Q0-Q3 values available on output pins
+    Data valid for next part of computation
+
+  If ~{FI} goes HIGH:
+    Data loading is blocked
+    Q0-Q3 hold their current values
+
+================================================================================
+
+YOUR MOD IMPACT ON SIGNAL TIMING
+================================================================================
+
+Original path: D0-D3 inputs come from fixed sources
+  Pin 12 (D2) connected to: __unnamed_84
+
+Your mod path: D0-D3 inputs come from combinational logic
+  Pin 12 (D2) to be driven by: U24 Pin 6 (XOR output)
+    which computes: Q2_OLD XOR D3
+
+Timing constraint you create:
+
+  T0→T1: CLK rising edge
+    [Old Q0-Q3 values available]
+      ↓ (approximately 1-5ns propagation)
+    [Q2_OLD appears at U11 Pin 5]
+      ↓ (your wire to U24 Pin 4)
+    [Q2_OLD appears at U24 Pin 4]
+      ↓ (U24 propagation delay ~10ns)
+    [XOR result appears at U24 Pin 6]
+      ↓ (your wire to U11 Pin 12)
+    [XOR result appears at U11 Pin 12]
+      ↓ (must be here at least 10ns before next CLK edge)
+    [Setup time: U11 latches value into D2]
+
+  Total delay needed: <10ns (setup time)
+  Total delay you have: ~15-20ns (wire + XOR + wire)
+
+  PROBLEM: You exceed setup time!
+  The XOR result may not be ready when the latch tries to sample it.
+
+SOLUTION OPTIONS:
+  1) Slower clock (increase period, gives more time)
+  2) Add register stage (delay latch clock slightly)
+  3) Different logic (use combinational output elsewhere)
+
+================================================================================
+
+NETS AND THEIR CURRENT DRIVERS
+================================================================================
+
+Net: CLK
+  Source:    U10 Pin 13
+  Dest:      U11 Pin 7
+  Type:      Clock signal
+  Status:    ✓ Active
+
+Net: ~{FI}
+  Source:    U60 Pin 8 (74HCT04)
+  Dest:      U11 Pin 9, U11 Pin 10, TP6 Pin 1
+  Type:      Control signal (inverted)
+  Status:    ✓ Active (source of U60 input unclear but output driven)
+
+Net: CLR
+  Source:    Likely U60 Pin 6 or similar inverter (not in ALU sheet)
+  Dest:      U11 Pin 15
+  Type:      Reset signal (active-low)
+  Status:    ⚠️ Source not verified in ALU sheet
+
+Net: __unnamed_80
+  Source:    UNKNOWN (no driver found)
+  Dest:      U11 Pin 1, U11 Pin 2
+  Type:      Output enable (active-low)
+  Status:    ⚠️ FLOATING - no external driver found
+
+Net: __unnamed_81
+  Source:    U11 Pin 5 (Q2 output)
+  Dest:      Unknown (your mod will add more destinations)
+  Type:      Data signal
+  Status:    ✓ Q2 output actively driven
+
+Net: __unnamed_84
+  Source:    Unknown (original D2 source)
+  Dest:      U11 Pin 12 (D2 input)
+  Type:      Data signal
+  Status:    ⚠️ Your mod replaces this driver
+
+================================================================================
+
+CHECKLIST BEFORE IMPLEMENTING MOD
+================================================================================
+
+□ Verify U60 Pin 7 input source in control.kicad_sch
+□ Verify CLR signal source (should be another U60 output)
+□ Find what drives __unnamed_80 (OE enable signal)
+□ Calculate clock frequency to verify timing headroom
+□ Verify Q2 can supply current to U24 Pin 4 (XOR input)
+□ Verify U24 Pin 6 can supply current to U11 Pin 12
+□ Check if you need pull-up/pull-down resistors on floating signals
+□ Measure actual ~{FI} waveform with scope before/after mod
+□ Verify no voltage spikes or ringing on U11 Pin 5 (Q2)
+□ Confirm latch still operates correctly after adding XOR feedback
+
+================================================================================

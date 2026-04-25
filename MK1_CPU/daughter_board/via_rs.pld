@@ -1,0 +1,57 @@
+GAL16V8    ; VIA register select latch + PHI2 inverter for MK1 daughter board
+VIA_RS     ;
+
+CLK   E0    E1    D0    D1    CLKIN NC    NC    NC   GND
+/OE   NC    NC    NC    NC    NC    PHI2  /RS3  /RS2 VCC
+
+
+; RS2/RS3 are ACTIVE-LOW registered outputs.
+; Power-up HIGH = RS line LOW = registers 0-3 accessible.
+; Latch when E1=HIGH and E0=LOW (exrs opcode). Hold otherwise.
+
+/RS2.R =  /D0 * E1 * /E0
+        + RS2 * /E1
+        + RS2 * E0
+
+/RS3.R =  /D1 * E1 * /E0
+        + RS3 * /E1
+        + RS3 * E0
+
+; PHI2: inverted system clock (combinational).
+; PHI2 rises on CLK falling edge → CS1=E0 has ~4us setup time.
+; PHI2 falls on CLK rising edge → latches current (not next) data.
+; ~10ns GAL propagation ensures E0 wins the race by ~45ns.
+
+PHI2  =  /CLKIN
+
+; nCS2: spare output (not connected). VIA ~CS2 is hardwired to GND.
+
+; nCS2 equation removed — output left undefined (tristated)
+
+
+DESCRIPTION
+
+ATF16V8B on MK1 VIA daughter board.
+
+RS2/RS3: active-low registered latch for 16-register VIA access.
+PHI2: inverted system clock for continuous VIA timer operation.
+
+Pin 1 (CLK) = system clock for registered output clocking.
+Pin 6 (CLKIN) = system clock as combinational input for PHI2 inversion.
+Both connect to J4 pin 15.
+
+VIA CS1 = E0 (direct wire, zero delay). PHI2 = NOT(CLK) via GAL.
+E0 changes ~55ns after CLK rising edge. PHI2 rises ~10ns after
+CLK falling edge (~4us later). CS1 setup time = ~4us >> 10ns min.
+
+Wiring:
+  GAL 1  CLK   = J4 pin 15 (registered output clock)
+  GAL 2  E0    = J4 pin 5  (also VIA pin 24 CS1)
+  GAL 3  E1    = J4 pin 7  (also VIA pin 22 R/~W)
+  GAL 4  D0    = J4 pin 2
+  GAL 5  D1    = J4 pin 4
+  GAL 6  CLKIN = J4 pin 15 (combinational input for PHI2)
+  GAL 11 /OE   = GND
+  GAL 17 PHI2  = VIA pin 25
+  GAL 18 /RS3  = VIA pin 35
+  GAL 19 /RS2  = VIA pin 36

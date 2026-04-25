@@ -1,5 +1,40 @@
 ;-- utility functions --
 
+;-- XOR -- ret $a = $a XOR $b
+#bank ".data"
+a_nand_b: #res 1
+b_nand_anandb: #res 1
+
+#bank ".instr"
+eor: ;ret $a = $a XOR $b
+
+    push $c
+    push $d
+    mov $a $d ; hold original logic a in $d
+
+    and $b $a
+    not ;$a = (A NAND B)
+    st $a a_nand_b
+
+    and $b $a
+    not ;$a = (B NAND(A NAND B))
+    st $a b_nand_anandb
+
+    mov $d $a
+    ld $c a_nand_b
+
+    and $c $a
+    not; $a = (A NAND (A NAND B))
+
+    ld $c b_nand_anandb
+
+    and $c $a
+    not; $a = (A NAND (A NAND B)) NAND (B NAND(A NAND B))
+    
+    pop $d
+    pop $c
+    ret
+
 ;--- multiplication ---
 multiply: ; $a * $b
   mov $b $c ;counter
